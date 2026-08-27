@@ -178,6 +178,7 @@ export default function App() {
   const [mode, setMode] = useState<Mode>(() => (localStorage.getItem("mode") as Mode) || "dark");
   const [page, setPage] = useState("home");
   const [langOpen, setLangOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Authentication State
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
@@ -215,6 +216,7 @@ export default function App() {
   const [contactMessage, setContactMessage] = useState("");
 
   const langBox = useRef<HTMLDivElement>(null);
+  const navBox = useRef<HTMLElement>(null);
   const t = copy[lang];
   const dir = lang === "en" || lang === "tr" ? "ltr" : "rtl";
 
@@ -434,6 +436,7 @@ export default function App() {
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (!langBox.current?.contains(e.target as Node)) setLangOpen(false);
+      if (!navBox.current?.contains(e.target as Node)) setMenuOpen(false);
     };
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
@@ -560,7 +563,7 @@ export default function App() {
   return (
     <div className="app">
       {/* Top Ticker */}
-      <header className="nav">
+      <header className="nav" ref={navBox}>
         <div className="ticker">
           <div className="ticker-track">
             {rollingAds.map((ad, i) => (
@@ -575,7 +578,7 @@ export default function App() {
             <img className="logo" src={logo} alt={displayBrand} width={52} height={52} />
             <span className="brand-name">{displayBrand}</span>
           </a>
-          <nav className="nav-links">
+          <nav className={"nav-links" + (menuOpen ? " open" : "")}>
             {nav.map(([id, label], i) => (
               <a
                 key={id}
@@ -591,6 +594,7 @@ export default function App() {
                   borderRadius: 999,
                 }}
                 onClick={(e) => {
+                  setMenuOpen(false);
                   if (id === "dashboard") {
                     e.preventDefault();
                     handleOpenDashboardClick();
@@ -633,6 +637,17 @@ export default function App() {
             </button>
             <button className="icon-btn mode-btn" onClick={() => setMode(mode === "dark" ? "light" : "dark")}>
               {mode === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <button
+              className={"icon-btn menu-btn" + (menuOpen ? " open" : "")}
+              aria-expanded={menuOpen}
+              aria-label={
+                lang === "tr" ? "Menü" : lang === "en" ? "Menu" : lang === "ar" ? "القائمة" : "تىزىملىك"
+              }
+              title={lang === "tr" ? "Menü" : lang === "en" ? "Menu" : lang === "ar" ? "القائمة" : "تىزىملىك"}
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              {menuOpen ? "✕" : "☰"}
             </button>
           </div>
         </div>
