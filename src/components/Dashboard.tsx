@@ -345,38 +345,17 @@ export default function Dashboard({
           SINGLE UNIFIED HEADER WITH STRICT ROW LAYOUT (NEVER STACKED VERTICALLY)
          ========================================================================= */}
       <header className="dash-header">
-        <div
-          className="dash-header-in wrap"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div className="dash-brand-block" style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+        <div className="dash-header-in wrap">
+          <div className="dash-brand-block">
             <span className="dash-badge">ADMIN</span>
-            <h1 className="dash-title" style={{ fontSize: "18px", margin: 0 }}>{formBrandName || t.dash.title}</h1>
+            <h1 className="dash-title">{formBrandName || t.dash.title}</h1>
           </div>
 
-          <div
-            className="dash-header-controls"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "8px",
-              flexWrap: "nowrap",
-              whiteSpace: "nowrap",
-            }}
-          >
+          <div className="dash-header-controls">
             {/* 1. Language Dropdown */}
-            <div className="lang-dd" ref={langBox} style={{ flexShrink: 0 }}>
+            <div className="lang-dd" ref={langBox}>
               <button
                 className={"ctl" + (langOpen ? " on" : "")}
-                style={{ padding: "8px 12px", fontSize: "13px", flexShrink: 0 }}
                 onClick={() => setLangOpen((v) => !v)}
               >
                 {langLabel[lang]}
@@ -403,19 +382,6 @@ export default function Dashboard({
               className="icon-btn dash-eye-btn"
               title={lang === "tr" ? "Siteye Dön" : lang === "en" ? "View Site" : lang === "ar" ? "الموقع" : "ئالدى بەتنى كۆرۈش"}
               aria-label="View Site"
-              style={{
-                flexShrink: 0,
-                width: "40px",
-                height: "40px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(124, 58, 237, 0.25))",
-                border: "1px solid rgba(56, 189, 248, 0.4)",
-                color: "#38bdf8",
-                display: "grid",
-                placeItems: "center",
-                cursor: "pointer",
-                boxShadow: "0 0 14px rgba(56, 189, 248, 0.18)",
-              }}
               onClick={onBackToSite}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -428,7 +394,6 @@ export default function Dashboard({
             <button
               className="icon-btn theme-btn"
               title={theme}
-              style={{ flexShrink: 0 }}
               onClick={onCycleTheme}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -440,7 +405,6 @@ export default function Dashboard({
             {/* 4. Dark / Light Mode Toggle */}
             <button
               className="icon-btn mode-btn"
-              style={{ flexShrink: 0 }}
               onClick={onToggleMode}
             >
               {mode === "dark" ? (
@@ -458,50 +422,17 @@ export default function Dashboard({
             {/* 5. Logout Button (Placed immediately next to Mode Toggle on the same line) */}
             <button
               className="dash-logout-pill-btn"
-              style={{
-                flexShrink: 0,
-                padding: "8px 14px",
-                borderRadius: "999px",
-                background: "rgba(239, 68, 68, 0.12)",
-                border: "1px solid rgba(239, 68, 68, 0.4)",
-                color: "#ef4444",
-                fontSize: "13px",
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "4px",
-                whiteSpace: "nowrap",
-              }}
               onClick={onLogout}
             >
               🔒 {lang === "tr" ? "Çıkış" : lang === "en" ? "Logout" : lang === "ar" ? "خروج" : "چىقىش"}
             </button>
 
             {/* 6. Dashboard Tabs Navigation Dropdown (Icon Only - Glowing Hamburger Menu) - on left side of Logout button */}
-            <div className="dash-nav-dd" ref={dashNavBox} style={{ position: "relative", flexShrink: 0 }}>
+            <div className="dash-nav-dd" ref={dashNavBox}>
               <button
                 className={"icon-btn dash-menu-icon-btn" + (dashMenuOpen ? " open" : "")}
                 title={t.dash.title}
                 aria-label="Dashboard Menu"
-                style={{
-                  flexShrink: 0,
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(2, 132, 199, 0.28))",
-                  border: "1px solid rgba(56, 189, 248, 0.45)",
-                  color: "#00f0ff",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4px",
-                  padding: 0,
-                  cursor: "pointer",
-                  boxShadow: "0 0 16px rgba(0, 240, 255, 0.22)",
-                  transition: "all 0.2s ease",
-                }}
                 onClick={() => setDashMenuOpen((v) => !v)}
               >
                 <span className="dash-menu-bar" />
