@@ -352,14 +352,19 @@ export default function Dashboard({
           </div>
 
           <div className="dash-header-controls">
-            {/* 1. Language Dropdown */}
+            {/* 1. Language Dropdown (Globe Icon Only) */}
             <div className="lang-dd" ref={langBox}>
               <button
-                className={"ctl" + (langOpen ? " on" : "")}
+                className={"icon-btn dash-lang-globe-btn" + (langOpen ? " on" : "")}
+                title={langLabel[lang]}
+                aria-label="Select Language"
                 onClick={() => setLangOpen((v) => !v)}
               >
-                {langLabel[lang]}
-                <span className={"caret" + (langOpen ? " up" : "")}>▾</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                  <path d="M2 12h20" />
+                </svg>
               </button>
               <div className={"lang-menu" + (langOpen ? " open" : "")}>
                 {(["ug", "tr", "en", "ar"] as Lang[]).map((l) => (
@@ -419,12 +424,17 @@ export default function Dashboard({
               )}
             </button>
 
-            {/* 5. Logout Button (Placed immediately next to Mode Toggle on the same line) */}
+            {/* 5. Logout Button (Icon Only - Lock Icon) */}
             <button
-              className="dash-logout-pill-btn"
+              className="icon-btn dash-logout-icon-btn"
+              title={lang === "tr" ? "Çıkış" : lang === "en" ? "Logout" : lang === "ar" ? "خروج" : "چىقىش"}
+              aria-label="Logout"
               onClick={onLogout}
             >
-              🔒 {lang === "tr" ? "Çıkış" : lang === "en" ? "Logout" : lang === "ar" ? "خروج" : "چىقىش"}
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
             </button>
 
             {/* 6. Dashboard Tabs Navigation Dropdown (Icon Only - Glowing Hamburger Menu) - on left side of Logout button */}
