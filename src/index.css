@@ -130,7 +130,15 @@ button { font: inherit; cursor: pointer; }
   50% { filter: brightness(1.2) saturate(1.25); }
 }
 
-.controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
 .ctl {
   border: 1px solid transparent;
   background: linear-gradient(120deg, #7c3aed, #c084fc);
@@ -143,24 +151,60 @@ button { font: inherit; cursor: pointer; }
   background-size: 200% 200%;
 }
 .ctl.on { outline: 2px solid #fef08a; }
+
+/* 🌐 CIRCULAR GLOBE LANGUAGE BUTTON */
+.lang-globe-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(124, 58, 237, 0.45);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(192, 132, 252, 0.25));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.25);
+  transition: all 0.22s ease;
+  padding: 0;
+}
+.lang-globe-btn:hover,
+.lang-globe-btn.on {
+  border-color: #c084fc;
+  box-shadow: 0 0 20px rgba(192, 132, 252, 0.6);
+  transform: scale(1.06);
+}
+
 .icon-btn {
-  width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent;
-  display: grid; place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.22s ease;
   animation: navPulse 5s ease-in-out infinite;
   background-size: 200% 200%;
+}
+.icon-btn:hover {
+  transform: scale(1.06);
 }
 .icon-btn.theme-btn {
   background: linear-gradient(140deg, #0369a1, #38bdf8);
   color: #fde68a;
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
   animation-delay: .4s;
 }
 .icon-btn.mode-btn {
   background: linear-gradient(140deg, #b45309, #fbbf24);
   color: #1e3a8a;
+  border-color: rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
   animation-delay: .8s;
 }
 .icon-btn.menu-btn {
-  display: none; /* only shown on mobile via media query below */
+  display: none;
   background: linear-gradient(140deg, #334155, #64748b);
   color: #fff;
   font-size: 18px;
@@ -169,25 +213,57 @@ button { font: inherit; cursor: pointer; }
 }
 .icon-btn.menu-btn.open { outline: 2px solid #e2e8f0; }
 
-/* 📱 MOBILE HEADER — compact single-row bar + collapsible nav panel */
+/* 📱 MOBILE HEADER — STRICT SINGLE-ROW BAR */
 @media (max-width: 860px) {
   .ticker { height: 30px; }
   .ticker-item { font-size: 12px; }
 
-  .nav-in { padding: 8px 0; gap: 8px; }
-
-  .brand { gap: 8px; min-width: 0; flex-shrink: 1; }
-  .logo { width: 38px; height: 38px; border-radius: 10px; }
-  .brand-name {
-    font-size: 15px; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis; max-width: 36vw;
+  .nav-in {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-wrap: nowrap !important;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .controls { margin-inline-start: auto; flex-wrap: nowrap; gap: 5px; }
-  .ctl { padding: 6px 10px; font-size: 12px; }
-  .caret { margin-inline-start: 3px; }
-  .icon-btn { width: 36px; height: 36px; border-radius: 10px; }
-  .icon-btn svg { width: 18px; height: 18px; }
+  .brand {
+    gap: 8px;
+    min-width: 0;
+    flex: 0 1 auto;
+    overflow: hidden;
+  }
+  .logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-size: 14.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: none;
+  }
+
+  .controls {
+    margin-inline-start: auto;
+    flex-wrap: nowrap !important;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .lang-globe-btn,
+  .icon-btn,
+  .mobile-menu-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+  .icon-btn svg {
+    width: 17px;
+    height: 17px;
+  }
   .icon-btn.menu-btn { display: grid; }
 
   /* keep the language dropdown inside the screen on phones */
@@ -207,6 +283,35 @@ button { font: inherit; cursor: pointer; }
   }
   .nav-links .nav-chip { display: block; text-align: center; }
 }
+
+@media (max-width: 480px) {
+  .nav-in {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .brand {
+    gap: 6px;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+  .brand-name {
+    font-size: 13.5px;
+  }
+  .controls {
+    gap: 4px;
+  }
+  .lang-globe-btn,
+  .icon-btn,
+  .mobile-menu-btn {
+    width: 31px;
+    height: 31px;
+    border-radius: 9px;
+    font-size: 13.5px;
+  }
+}
+
 .lang-dd { position: relative; }
 .caret { display: inline-block; margin-inline-start: 6px; transition: transform .2s; }
 .caret.up { transform: rotate(180deg); }

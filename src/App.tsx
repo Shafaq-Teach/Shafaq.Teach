@@ -709,9 +709,13 @@ export default function App() {
           {/* Header Controls & Mobile Toggle */}
           <div className="controls">
             <div className="lang-dd" ref={langBox}>
-              <button className={"ctl" + (langOpen ? " on" : "")} onClick={() => setLangOpen((v) => !v)}>
-                {langLabel[lang]}
-                <span className={"caret" + (langOpen ? " up" : "")}>▾</span>
+              <button
+                className={"ctl lang-globe-btn" + (langOpen ? " on" : "")}
+                onClick={() => setLangOpen((v) => !v)}
+                title="تىل تاللاش / Language"
+                aria-label="Language Selector"
+              >
+                <span className="globe-icon" style={{ fontSize: 17, display: "inline-block" }}>🌐</span>
               </button>
               <div className={"lang-menu" + (langOpen ? " open" : "")}>
                 {(["ug", "tr", "en", "ar"] as Lang[]).map((l) => (
