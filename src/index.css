@@ -975,7 +975,7 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(56, 189, 248, 0.22);
-  padding: 12px 0;
+  padding: 12px 18px;
   margin-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
@@ -987,6 +987,7 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   gap: 12px;
   width: 100%;
   box-sizing: border-box;
+  padding: 0 4px;
 }
 .dash-brand-block {
   display: flex;
@@ -1250,11 +1251,12 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
     display: none !important;
   }
   .dash-header {
-    padding: 10px 0;
+    padding: 10px 14px;
     margin-bottom: 16px;
   }
   .dash-header-in {
     gap: 8px;
+    padding: 0 4px;
   }
   .dash-brand-block {
     gap: 6px;
@@ -1265,8 +1267,9 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
     white-space: nowrap;
   }
   .dash-header-controls {
-    gap: 4px;
+    gap: 5px;
     flex-shrink: 0;
+    margin-inline-start: 4px;
   }
   .dash-eye-btn,
   .dash-lang-globe-btn,
@@ -1280,20 +1283,23 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 }
 
 @media (max-width: 480px) {
+  .dash-header {
+    padding: 8px 12px;
+  }
+  .dash-header-in {
+    gap: 6px;
+    padding: 0 2px;
+  }
   .dash-brand-block {
     gap: 4px;
     flex-shrink: 0;
   }
   .dash-title {
-    font-size: 13.5px;
+    font-size: 13px;
     white-space: nowrap;
   }
-  .dash-badge {
-    font-size: 9px;
-    padding: 2px 4px;
-  }
   .dash-header-controls {
-    gap: 3px;
+    gap: 4px;
     flex-shrink: 0;
   }
   .dash-eye-btn,
@@ -1301,8 +1307,8 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   .dash-logout-icon-btn,
   .dash-header-controls .icon-btn,
   .dash-menu-icon-btn {
-    width: 30px;
-    height: 30px;
+    width: 31px;
+    height: 31px;
     border-radius: 8px;
   }
   .dash-kpi-card {

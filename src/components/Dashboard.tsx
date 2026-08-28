@@ -347,7 +347,6 @@ export default function Dashboard({
       <header className="dash-header">
         <div className="dash-header-in wrap">
           <div className="dash-brand-block">
-            <span className="dash-badge">ADMIN</span>
             <h1 className="dash-title">{formBrandName || t.dash.title}</h1>
           </div>
 
