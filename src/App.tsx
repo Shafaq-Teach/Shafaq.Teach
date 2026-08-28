@@ -217,7 +217,6 @@ export default function App() {
   const [contactMessage, setContactMessage] = useState("");
 
   const langBox = useRef<HTMLDivElement>(null);
-  const navBox = useRef<HTMLElement>(null);
   const t = copy[lang];
   const dir = lang === "en" || lang === "tr" ? "ltr" : "rtl";
 
