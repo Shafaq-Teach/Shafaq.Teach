@@ -10,6 +10,17 @@ import Dashboard, {
 } from "./components/Dashboard";
 import AdminAuthModal, { type AdminCredentials } from "./components/AdminAuthModal";
 import AiAssistantModal from "./components/AiAssistantModal";
+import {
+  getCloudPromoAds,
+  syncCloudPromoAds,
+  getCloudShowcaseProjects,
+  syncCloudShowcaseProjects,
+  getCloudLeads,
+  syncCloudLeads,
+  getCloudSettings,
+  syncCloudSettings,
+  supabase,
+} from "./supabase";
 
 const logo = "media/logo-v3.jpeg";
 const heroTech = "media/hero-v3.jpg?v=9";
@@ -234,6 +245,7 @@ export default function App() {
   const updateSettings = (newSettings: StudioSettings) => {
     setSettings(newSettings);
     localStorage.setItem("shafaq_studio_settings", JSON.stringify(newSettings));
+    syncCloudSettings(newSettings);
   };
 
   // 2. Promo Ads (Persisted and synced)
@@ -260,6 +272,7 @@ export default function App() {
   const updatePromoAds = (newAds: PromoAdItem[]) => {
     setPromoAds(newAds);
     localStorage.setItem("shafaq_promo_ads", JSON.stringify(newAds));
+    syncCloudPromoAds(newAds);
   };
 
   // 3. Showcase Projects (Persisted and synced)
@@ -276,6 +289,7 @@ export default function App() {
   const updateShowcaseProjects = (newProjects: ShowcaseProject[]) => {
     setShowcaseProjects(newProjects);
     localStorage.setItem("shafaq_showcase_projects", JSON.stringify(newProjects));
+    syncCloudShowcaseProjects(newProjects);
   };
 
   // 4. Leads (Persisted and synced)
@@ -323,7 +337,68 @@ export default function App() {
   const updateLeads = (newLeads: LeadItem[]) => {
     setLeads(newLeads);
     localStorage.setItem("shafaq_leads", JSON.stringify(newLeads));
+    syncCloudLeads(newLeads);
   };
+
+  // 🌐 INITIAL CLOUD DATA FETCH & REALTIME LISTENERS FROM SUPABASE
+  useEffect(() => {
+    // 1. Fetch Cloud Promo Ads
+    getCloudPromoAds().then((cloudAds) => {
+      if (cloudAds && cloudAds.length > 0) {
+        setPromoAds(cloudAds);
+        localStorage.setItem("shafaq_promo_ads", JSON.stringify(cloudAds));
+      }
+    });
+
+    // 2. Fetch Cloud Showcase Projects
+    getCloudShowcaseProjects().then((cloudProjects) => {
+      if (cloudProjects && cloudProjects.length > 0) {
+        setShowcaseProjects(cloudProjects);
+        localStorage.setItem("shafaq_showcase_projects", JSON.stringify(cloudProjects));
+      }
+    });
+
+    // 3. Fetch Cloud Leads
+    getCloudLeads().then((cloudLeads) => {
+      if (cloudLeads && cloudLeads.length > 0) {
+        setLeads(cloudLeads);
+        localStorage.setItem("shafaq_leads", JSON.stringify(cloudLeads));
+      }
+    });
+
+    // 4. Fetch Cloud Settings
+    getCloudSettings().then((cloudSettings) => {
+      if (cloudSettings) {
+        setSettings(cloudSettings);
+        localStorage.setItem("shafaq_studio_settings", JSON.stringify(cloudSettings));
+      }
+    });
+
+    // 5. Setup Realtime sync
+    try {
+      const channel = supabase
+        .channel("supabase-realtime-sync")
+        .on("postgres_changes", { event: "*", schema: "public", table: "promo_ads" }, () => {
+          getCloudPromoAds().then((ads) => ads && setPromoAds(ads));
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "showcase_projects" }, () => {
+          getCloudShowcaseProjects().then((projs) => projs && setShowcaseProjects(projs));
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "leads" }, () => {
+          getCloudLeads().then((lds) => lds && setLeads(lds));
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "studio_settings" }, () => {
+          getCloudSettings().then((st) => st && setSettings(st));
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (err) {
+      console.warn("Realtime channel setup error:", err);
+    }
+  }, []);
 
   // 5. Kanban Projects (Persisted and synced)
   const [projects, setProjects] = useState<ProjectItem[]>(() => {
