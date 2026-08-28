@@ -705,14 +705,187 @@ button { font: inherit; cursor: pointer; }
 .svc-4 { background: linear-gradient(160deg, #b45309, #78350f); color: #fff7ed; border-color: transparent; }
 .svc-5 { background: linear-gradient(160deg, #0f766e, #134e4a); color: #ecfdfb; border-color: transparent; }
 
-/* PROMO SLIDER */
-.promo-slider { overflow: hidden; margin: 8px 0 28px; border-radius: 22px; border: 1px solid var(--line); }
-.promo-track { display: flex; width: max-content; gap: 14px; padding: 14px; animation: promo 32s linear infinite; }
-[dir="ltr"] .promo-track { animation-name: promo-ltr; }
-.promo-card { width: min(420px, 78vw); height: 200px; border-radius: 16px; background-size: cover; background-position: center; position: relative; flex: 0 0 auto; overflow: hidden; }
-.promo-card span { position: absolute; inset: auto 0 0 0; padding: 16px 18px; background: linear-gradient(transparent, rgba(0,0,0,.82)); color: #fff; font-weight: 600; }
-@keyframes promo { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-@keyframes promo-ltr { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* 🌟 PROMO STATIC CAROUSEL (2 CARDS ON PC, 1 CARD ON MOBILE WITH ARROWS) */
+.promo-carousel-sec {
+  position: relative;
+  margin: 12px 0 32px;
+  width: 100%;
+}
+.promo-carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+.promo-carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 12px;
+}
+.promo-carousel-track {
+  display: flex;
+  gap: 16px;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+  transform: translateX(calc(var(--promo-idx, 0) * -50% - var(--promo-idx, 0) * 8px));
+}
+[dir="rtl"] .promo-carousel-track {
+  transform: translateX(calc(var(--promo-idx, 0) * 50% + var(--promo-idx, 0) * 8px));
+}
+
+.promo-slide-item {
+  flex: 0 0 calc(50% - 8px);
+  min-width: calc(50% - 8px);
+  max-width: calc(50% - 8px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .promo-carousel-viewport {
+    padding: 8px;
+  }
+  .promo-carousel-track {
+    transform: translateX(calc(var(--promo-idx, 0) * -100% - var(--promo-idx, 0) * 16px));
+  }
+  [dir="rtl"] .promo-carousel-track {
+    transform: translateX(calc(var(--promo-idx, 0) * 100% + var(--promo-idx, 0) * 16px));
+  }
+  .promo-slide-item {
+    flex: 0 0 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+.promo-banner-card {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: var(--bg2);
+}
+@media (max-width: 768px) {
+  .promo-banner-card {
+    height: 190px;
+    border-radius: 14px;
+  }
+}
+
+.promo-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.promo-banner-card:hover .promo-banner-img {
+  transform: scale(1.04);
+}
+.promo-banner-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 22px 20px 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 36, 0.65) 30%, rgba(2, 6, 36, 0.95) 100%);
+  display: flex;
+  align-items: center;
+}
+.promo-banner-text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.6;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+@media (max-width: 768px) {
+  .promo-banner-text {
+    font-size: 13.5px;
+  }
+  .promo-banner-overlay {
+    padding: 14px 16px 12px;
+  }
+}
+
+/* NAVIGATION BUTTONS */
+.promo-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(6, 12, 44, 0.88);
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  color: #38bdf8;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), 0 0 16px rgba(56, 189, 248, 0.25);
+  transition: all 0.22s ease;
+}
+.promo-nav-btn:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(124, 58, 237, 0.45));
+  border-color: #00f0ff;
+  color: #fff;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.45);
+}
+.promo-prev-btn {
+  inset-inline-start: 16px;
+}
+.promo-next-btn {
+  inset-inline-end: 16px;
+}
+@media (max-width: 768px) {
+  .promo-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .promo-prev-btn {
+    inset-inline-start: 10px;
+  }
+  .promo-next-btn {
+    inset-inline-end: 10px;
+  }
+}
+
+/* DOTS */
+.promo-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.promo-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.25);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+.promo-dot.active {
+  width: 24px;
+  background: linear-gradient(90deg, #38bdf8, #60a5fa);
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
 
 /* 🌟 GENTLE HOVER WOBBLE / SHAKE ON ALL ICONS & SYMBOLS */
 @keyframes iconGentleWiggle {

@@ -247,6 +247,16 @@ export default function App() {
     return defaultPromoAds;
   });
 
+  const [promoIndex, setPromoIndex] = useState(0);
+
+  const handlePrevPromo = () => {
+    setPromoIndex((prev) => (prev <= 0 ? Math.max(0, promoAds.length - 1) : prev - 1));
+  };
+
+  const handleNextPromo = () => {
+    setPromoIndex((prev) => (prev >= promoAds.length - 1 ? 0 : prev + 1));
+  };
+
   const updatePromoAds = (newAds: PromoAdItem[]) => {
     setPromoAds(newAds);
     localStorage.setItem("shafaq_promo_ads", JSON.stringify(newAds));
@@ -956,26 +966,68 @@ export default function App() {
           </section>
         )}
 
-        {/* PROMO MARQUEE SLIDER (MULTILINGUAL PROMO CARDS) */}
+        {/* 🌟 PROMO STATIC CAROUSEL (2 CARDS ON PC, 1 CARD ON MOBILE, WITH ARROW BUTTONS & FULL IMAGES) */}
         {page === "home" && (
-          <section className="promo-slider">
-            <div className="promo-track">
-              {[0, 1, 2, 0, 1, 2].map((idx, i) => {
-                const adImage = promoAds[idx]?.image || defaultPromoAds[idx]?.image;
-                const adText = t.ads[idx] || promoAds[idx]?.text;
-                return (
-                  <article
-                    key={i}
-                    className="promo-card"
-                    style={{
-                      backgroundImage: `url(${adImage})`,
-                      backgroundPosition: "center",
-                    }}
-                  >
-                    <span>{adText}</span>
-                  </article>
-                );
-              })}
+          <section className="promo-carousel-sec">
+            <div className="promo-carousel-container">
+              {/* Prev Navigation Button */}
+              <button
+                className="promo-nav-btn promo-prev-btn"
+                onClick={dir === "rtl" ? handleNextPromo : handlePrevPromo}
+                aria-label="Previous Slide"
+                title={lang === "ug" ? "ئالدىنقى" : lang === "ar" ? "السابق" : lang === "tr" ? "Önceki" : "Previous"}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={dir === "rtl" ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6"} />
+                </svg>
+              </button>
+
+              {/* Viewport */}
+              <div className="promo-carousel-viewport">
+                <div
+                  className="promo-carousel-track"
+                  style={{ "--promo-idx": promoIndex } as React.CSSProperties}
+                >
+                  {promoAds.map((ad, idx) => {
+                    const adImage = ad.image || defaultPromoAds[idx]?.image;
+                    const adText = t.ads[idx] || ad.text;
+                    return (
+                      <div className="promo-slide-item" key={ad.id || idx}>
+                        <article className="promo-banner-card">
+                          <img className="promo-banner-img" src={adImage} alt={adText} />
+                          <div className="promo-banner-overlay">
+                            <span className="promo-banner-text">{adText}</span>
+                          </div>
+                        </article>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Next Navigation Button */}
+              <button
+                className="promo-nav-btn promo-next-btn"
+                onClick={dir === "rtl" ? handlePrevPromo : handleNextPromo}
+                aria-label="Next Slide"
+                title={lang === "ug" ? "كېيىنكى" : lang === "ar" ? "التالي" : lang === "tr" ? "Sonraki" : "Next"}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={dir === "rtl" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} />
+                </svg>
+              </button>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="promo-dots">
+              {promoAds.map((_, i) => (
+                <button
+                  key={i}
+                  className={"promo-dot" + (promoIndex === i ? " active" : "")}
+                  onClick={() => setPromoIndex(i)}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
             </div>
           </section>
         )}
