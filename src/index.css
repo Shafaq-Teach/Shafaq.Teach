@@ -1113,9 +1113,9 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 
 .dash-nav-menu {
   position: absolute;
-  inset-inline-start: 0;
   top: calc(100% + 8px);
-  min-width: 220px;
+  min-width: 230px;
+  max-width: calc(100vw - 24px);
   background: rgba(6, 12, 44, 0.96);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -1132,6 +1132,14 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   z-index: 60;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.15);
 }
+[dir="rtl"] .dash-nav-menu {
+  left: 0;
+  right: auto;
+}
+[dir="ltr"] .dash-nav-menu {
+  right: 0;
+  left: auto;
+}
 .dash-nav-menu.open {
   max-height: 440px;
   opacity: 1;
@@ -1142,12 +1150,13 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   background: transparent;
   color: #f1f5f9;
   text-align: start;
-  padding: 10px 12px;
+  padding: 10px 14px;
   font-weight: 700;
   font-size: 13.5px;
   border-radius: 10px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -1161,11 +1170,9 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   color: #020624;
   box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
 }
-.dash-nav-menu .tab-ic {
-  font-size: 15px;
-}
 .dash-nav-menu .tab-tx {
   flex: 1;
+  text-align: start;
 }
 
 .dash-layout {

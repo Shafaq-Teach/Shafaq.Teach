@@ -445,21 +445,18 @@ export default function Dashboard({
                   className={activeTab === "overview" ? "on" : ""}
                   onClick={() => { setActiveTab("overview"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">📊</span>
                   <span className="tab-tx">{t.dash.navOverview}</span>
                 </button>
                 <button
                   className={activeTab === "kanban" ? "on" : ""}
                   onClick={() => { setActiveTab("kanban"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">📋</span>
                   <span className="tab-tx">{t.dash.navKanban}</span>
                 </button>
                 <button
                   className={activeTab === "leads" ? "on" : ""}
                   onClick={() => { setActiveTab("leads"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">✉️</span>
                   <span className="tab-tx">{t.dash.navLeads}</span>
                   <span className="dash-pill-count">{leads.length}</span>
                 </button>
@@ -467,21 +464,18 @@ export default function Dashboard({
                   className={activeTab === "cms" ? "on" : ""}
                   onClick={() => { setActiveTab("cms"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">🎨</span>
                   <span className="tab-tx">{t.dash.navCms}</span>
                 </button>
                 <button
                   className={activeTab === "invoices" ? "on" : ""}
                   onClick={() => { setActiveTab("invoices"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">🧾</span>
                   <span className="tab-tx">{t.dash.navInvoices}</span>
                 </button>
                 <button
                   className={activeTab === "pos" ? "on" : ""}
                   onClick={() => { setActiveTab("pos"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">🖨️</span>
                   <span className="tab-tx">{t.dash.navPos}</span>
                   <span className="dash-pill-online">●</span>
                 </button>
@@ -489,7 +483,6 @@ export default function Dashboard({
                   className={activeTab === "settings" ? "on" : ""}
                   onClick={() => { setActiveTab("settings"); setDashMenuOpen(false); }}
                 >
-                  <span className="tab-ic">⚙️</span>
                   <span className="tab-tx">{t.dash.navSettings}</span>
                 </button>
               </div>
