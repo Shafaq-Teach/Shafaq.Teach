@@ -1042,14 +1042,16 @@ export default function App() {
               </div>
             </div>
             <div className="grid g2">
-              {t.works.map((w, i) => {
-                const img = showcaseProjects[i]?.image || defaultShowcaseProjects[i]?.image;
-                const nameColor = WORK_NAME_COLORS[i];
-                const descColor = WORK_DESC_COLORS[i];
+              {showcaseProjects.map((p, i) => {
+                const img = p.image || defaultShowcaseProjects[i]?.image || "media/pos-v4.jpg";
+                const nameColor = p.nameColor || WORK_NAME_COLORS[i % WORK_NAME_COLORS.length];
+                const descColor = p.descColor || WORK_DESC_COLORS[i % WORK_DESC_COLORS.length];
+                const displayName = p.name || t.works[i]?.t || "تۈر";
+                const displayDesc = p.desc || t.works[i]?.d || p.title || "";
                 return (
                   <article
                     className="card work-card interactive-work-card"
-                    key={w.t + i}
+                    key={p.id || i}
                     onClick={() => setActiveProject(i)}
                   >
                     <div className="work-photo-wrap">
@@ -1070,10 +1072,10 @@ export default function App() {
                         className="work-name"
                         style={{ color: nameColor, background: "#ecfdf5" }}
                       >
-                        {w.t}
+                        {displayName}
                       </b>
                       {" — "}
-                      <span style={{ color: descColor }}>{w.d}</span>
+                      <span style={{ color: descColor }}>{displayDesc}</span>
                     </p>
                   </article>
                 );

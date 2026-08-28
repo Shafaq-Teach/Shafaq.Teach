@@ -165,6 +165,20 @@ export default function Dashboard({
     }
   }, [showcaseProjects]);
 
+  // Add New Showcase Project State
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  const [newProjName, setNewProjName] = useState("");
+  const [newProjTitleCms, setNewProjTitleCms] = useState("");
+  const [newProjCategory, setNewProjCategory] = useState("");
+  const [newProjDesc, setNewProjDesc] = useState("");
+  const [newProjTags, setNewProjTags] = useState("");
+  const [newProjImage, setNewProjImage] = useState("media/pos-v4.jpg");
+
+  // Add New Promo Ad State
+  const [showAddAdModal, setShowAddAdModal] = useState(false);
+  const [newAdContent, setNewAdContent] = useState("");
+  const [newAdImg, setNewAdImg] = useState("media/pos-v4.jpg");
+
   // Controlled Settings Form State
   const [formBrandName, setFormBrandName] = useState(settings.brandName);
   const [formWhatsapp, setFormWhatsapp] = useState(settings.whatsapp);
@@ -298,6 +312,91 @@ export default function Dashboard({
         ? "تم تحديث الأعمال وصورها في الموقع بنجاح!"
         : "تاللانما ئەسەرلەر ۋە رەسىملەر ئالدى بەتكە شۇ ھامان يېڭىلاندى! 💾"
     );
+  };
+
+  // Add New Project Handlers
+  const handleNewProjectImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setNewProjImage(event.target?.result as string);
+      onShowToast(lang === "tr" ? "Görsel seçildi!" : "رەسىم تاللاندى!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateShowcaseProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    const item: ShowcaseProject = {
+      id: "work-" + Date.now(),
+      name: newProjName.trim() || (lang === "tr" ? "Proje" : "ئەسەر"),
+      title: newProjTitleCms.trim() || (lang === "tr" ? "Yeni Tasarım Projesi" : "يېڭى لايىھە ۋە پىروگرامما تۈرى"),
+      category: newProjCategory.trim() || (lang === "tr" ? "Teknoloji & Yazılım" : "تور ۋە يانفون تېخنىكىسى"),
+      desc: newProjDesc.trim() || (lang === "tr" ? "Kapsamlı yazılım çözümü" : "كەسپىي پىروگرامما ۋە لايىھە ھەل قىلىش چارىسى"),
+      tags: newProjTags.split(",").map((s) => s.trim()).filter(Boolean).length > 0
+        ? newProjTags.split(",").map((s) => s.trim()).filter(Boolean)
+        : ["React", "TypeScript", "UI/UX"],
+      image: newProjImage || "media/pos-v4.jpg",
+      nameColor: "#14532d",
+      descColor: "#0369a1",
+    };
+    const updated = [item, ...editableProjects];
+    setEditableProjects(updated);
+    onUpdateShowcaseProjects(updated);
+    setShowAddProjectModal(false);
+    setNewProjName("");
+    setNewProjTitleCms("");
+    setNewProjCategory("");
+    setNewProjDesc("");
+    setNewProjTags("");
+    setNewProjImage("media/pos-v4.jpg");
+    onShowToast(lang === "tr" ? "Yeni proje eklendi ve sitede yayınlandı!" : "يېڭى ئەسەر قوشۇلدى ۋە ئالدى بەتكە يېڭىلاندى! 🎨✨");
+  };
+
+  const handleDeleteShowcaseProject = (id: string) => {
+    if (!confirm(lang === "tr" ? "Bu projeyi silmek istediğinize emin misiniz?" : "بۇ ئەسەرنى ئۆچۈرۈشنى جەزملەشتۈرەمسىز؟")) return;
+    const updated = editableProjects.filter((p) => p.id !== id);
+    setEditableProjects(updated);
+    onUpdateShowcaseProjects(updated);
+    onShowToast(lang === "tr" ? "Proje silindi!" : "ئەسەر تىزىملىكتىن ئۆچۈرۈلدى! 🗑️");
+  };
+
+  // Add New Promo Ad Handlers
+  const handleNewAdImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setNewAdImg(event.target?.result as string);
+      onShowToast(lang === "tr" ? "Reklam görseli seçildi!" : "ئېلان رەسىمى تاللاندى!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreatePromoAd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdContent.trim()) return;
+    const item: PromoAdItem = {
+      id: "ad-" + Date.now(),
+      text: newAdContent.trim(),
+      image: newAdImg || "media/pos-v4.jpg",
+    };
+    const updated = [...editablePromoAds, item];
+    setEditablePromoAds(updated);
+    onUpdatePromoAds(updated);
+    setShowAddAdModal(false);
+    setNewAdContent("");
+    setNewAdImg("media/pos-v4.jpg");
+    onShowToast(lang === "tr" ? "Yeni reklam eklendi ve sitede yayınlandı!" : "يېڭى ئېلان قوشۇلدى ۋە ئالدى بەتكە يېڭىلاندى! 📢✨");
+  };
+
+  const handleDeletePromoAd = (id: string) => {
+    if (!confirm(lang === "tr" ? "Bu reklamı silmek istediğinize emin misiniz?" : "بۇ ئېلاننى ئۆچۈرۈشنى جەزملەشتۈرەمسىز؟")) return;
+    const updated = editablePromoAds.filter((a) => a.id !== id);
+    setEditablePromoAds(updated);
+    onUpdatePromoAds(updated);
+    onShowToast(lang === "tr" ? "Reklam silindi!" : "ئېلان تىزىملىكتىن ئۆچۈرۈلدى! 🗑️");
   };
 
   const saveSettings = (e: React.FormEvent) => {
@@ -947,9 +1046,100 @@ export default function Dashboard({
               <div className="dash-cms-grid">
                 {/* 1. EDITABLE SHOWCASE PROJECTS */}
                 <div className="card">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <h3 style={{ margin: 0 }}>🖼️ {lang === "tr" ? "Öne Çıkan Projeler (Görsel ve Detay Düzenleme)" : "تاللانما ئەسەرلەر تىزىملىكى (تەھرىرلەش ۋە رەسىم يۈكلەش)"}</h3>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+                    <h3 style={{ margin: 0 }}>🖼️ {lang === "tr" ? "Öne Çıkan Projeler" : "تاللانما ئەسەرلەر تىزىملىكى"}</h3>
+                    <button
+                      className="btn"
+                      style={{ padding: "6px 14px", fontSize: 13 }}
+                      onClick={() => setShowAddProjectModal((v) => !v)}
+                    >
+                      {showAddProjectModal ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "➕ Yeni Proje Ekle" : "➕ يېڭى ئەسەر قوشۇش")}
+                    </button>
                   </div>
+
+                  {/* Add New Showcase Project Form Modal / Drawer */}
+                  {showAddProjectModal && (
+                    <div className="card" style={{ background: "rgba(6, 12, 44, 0.95)", border: "1.5px solid var(--accent)", padding: 18, marginBottom: 16 }}>
+                      <h4 style={{ margin: "0 0 12px", color: "var(--accent)" }}>
+                        ✨ {lang === "tr" ? "Yeni Öne Çıkan Proje Ekle" : "يېڭى تاللانما ئەسەر ۋە تەپسىلاتىنى قوشۇش"}
+                      </h4>
+                      <form onSubmit={handleCreateShowcaseProject} className="form">
+                        <div className="grid g2">
+                          <div>
+                            <label className="est-label">{lang === "tr" ? "Kısa İsim (Örn: Restoran, E-Ticaret):" : "قىسقا ئىسمى (مەسىلەن: رىستۇران، سودا، ئەپ):"}</label>
+                            <input
+                              value={newProjName}
+                              onChange={(e) => setNewProjName(e.target.value)}
+                              placeholder={lang === "tr" ? "Örn: Restoran" : "مەسىلەن: ئاشخانا"}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="est-label">{lang === "tr" ? "Kategori:" : "كەسپىي تۈرى:"}</label>
+                            <input
+                              value={newProjCategory}
+                              onChange={(e) => setNewProjCategory(e.target.value)}
+                              placeholder={lang === "tr" ? "Örn: Web & Mobil Uygulama" : "مەسىلەن: ئاشخانا ۋە مېھمانساراي تېخنىكىسى"}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Tam Proje Başlığı:" : "تولۇق ئەسەر نامى / تېمىسى:"}</label>
+                          <input
+                            value={newProjTitleCms}
+                            onChange={(e) => setNewProjTitleCms(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Çok Dilli Akıllı Restoran ve QR Menü" : "مەسىلەن: كۆپ تىللىق ئەقلىي ئاشخانا ۋە QR زاكاز سىستېمىسى"}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Açıklama / Detay:" : "قىسقىچە چۈشەندۈرۈشى ۋە تەپسىلاتى:"}</label>
+                          <input
+                            value={newProjDesc}
+                            onChange={(e) => setNewProjDesc(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Çok dilli sipariş ve mutfak ekranı" : "مەسىلەن: كۆپ تىللىق زاكاز ۋە ئاشپەز ئېكرانى"}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Etiketler (Virgülle ayırın):" : "تېخنىكا بەلگىلىرى (ئۈتۈر بىلەن ئايرىڭ):"}</label>
+                          <input
+                            value={newProjTags}
+                            onChange={(e) => setNewProjTags(e.target.value)}
+                            placeholder="React, TypeScript, QR Menu, Cloud"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Görsel Seç / Yükle:" : "ئەسەر رەسىمى يۈكلەش:"}</label>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            {newProjImage && (
+                              <img src={newProjImage} alt="" style={{ width: 80, height: 55, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleNewProjectImageUpload}
+                              className="dash-file-input"
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                          <button type="submit" className="btn">
+                            💾 {lang === "tr" ? "Projeyi Ekle ve Yayınla" : "بۇ ئەسەرنى قوشۇش ۋە ئالدى بەتكە يېڭىلاش"}
+                          </button>
+                          <button type="button" className="btn ghost" onClick={() => setShowAddProjectModal(false)}>
+                            ✕ {lang === "tr" ? "İptal" : "ئەمەلدىن قالدۇرۇش"}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
 
                   <div className="cms-items-list">
                     {editableProjects.map((item, idx) => (
@@ -964,12 +1154,23 @@ export default function Dashboard({
                             <div className="cms-work-title">{item.title}</div>
                             <div style={{ fontSize: 12, color: "var(--muted)" }}>{item.desc}</div>
                           </div>
-                          <button
-                            className="btn ghost"
-                            onClick={() => setEditingProjectIndex(editingProjectIndex === idx ? null : idx)}
-                          >
-                            {editingProjectIndex === idx ? (lang === "tr" ? "Kapat" : "تاقاش") : (lang === "tr" ? "Düzenle ✏️" : "تەھرىرلەش ✏️")}
-                          </button>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "6px 12px", fontSize: 13 }}
+                              onClick={() => setEditingProjectIndex(editingProjectIndex === idx ? null : idx)}
+                            >
+                              {editingProjectIndex === idx ? (lang === "tr" ? "Kapat" : "تاقاش") : (lang === "tr" ? "Düzenle ✏️" : "تەھرىرلەش ✏️")}
+                            </button>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "6px 10px", fontSize: 13, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
+                              onClick={() => handleDeleteShowcaseProject(item.id)}
+                              title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </div>
 
                         {/* Expandable Project Editor */}
@@ -1052,16 +1253,77 @@ export default function Dashboard({
 
                 {/* 2. EDITABLE PROMO ADS WITH IMAGE UPLOAD */}
                 <div className="card">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
                     <h3 style={{ margin: 0 }}>📢 {lang === "tr" ? "Kayan Yazı ve Reklam Görselleri" : "سىيرىلما لېنتا ئېلانلىرى ۋە رەسىم يۈكلەش"}</h3>
+                    <button
+                      className="btn"
+                      style={{ padding: "6px 14px", fontSize: 13 }}
+                      onClick={() => setShowAddAdModal((v) => !v)}
+                    >
+                      {showAddAdModal ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "➕ Yeni Reklam Ekle" : "➕ يېڭى ئېلان قوشۇش")}
+                    </button>
                   </div>
+
+                  {/* Add New Promo Ad Form Modal / Drawer */}
+                  {showAddAdModal && (
+                    <div className="card" style={{ background: "rgba(6, 12, 44, 0.95)", border: "1.5px solid var(--accent)", padding: 18, marginBottom: 16 }}>
+                      <h4 style={{ margin: "0 0 12px", color: "var(--accent)" }}>
+                        📢 {lang === "tr" ? "Yeni Kayan Yazı ve Reklam Ekle" : "يېڭى ئېلان ۋە تەپسىلاتىنى قوشۇش"}
+                      </h4>
+                      <form onSubmit={handleCreatePromoAd} className="form">
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Reklam Metni / Başlığı:" : "ئېلان تېكىستى ۋە مەزمۇنى:"}</label>
+                          <input
+                            value={newAdContent}
+                            onChange={(e) => setNewAdContent(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Yeni: Restoran POS sistemi - Özel kampanya" : "مەسىلەن: يېڭى: ئاشخانا POS سىستېمىسى — بىر ھەپتە ئىچىدە قاچىلاش"}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Reklam Görseli Seç / Yükle:" : "ئېلان رەسىمى تاللاش ۋە يۈكلەش:"}</label>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            {newAdImg && (
+                              <img src={newAdImg} alt="" style={{ width: 80, height: 55, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleNewAdImageUpload}
+                              className="dash-file-input"
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                          <button type="submit" className="btn">
+                            💾 {lang === "tr" ? "Reklamı Ekle ve Yayınla" : "ئېلاننى قوشۇش ۋە ئالدى بەتكە يېڭىلاش"}
+                          </button>
+                          <button type="button" className="btn ghost" onClick={() => setShowAddAdModal(false)}>
+                            ✕ {lang === "tr" ? "İptal" : "ئەمەلدىن قالدۇرۇش"}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
 
                   <div className="cms-ads-list">
                     {editablePromoAds.map((ad, ai) => (
                       <div className="cms-ad-card-box" key={ad.id || ai}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                          <span className="ad-num">#{ai + 1}</span>
-                          <strong style={{ fontSize: 13 }}>{lang === "tr" ? `Reklam Kalemi ${ai + 1}` : `${ai + 1}-ئېلان كارتىسى`}</strong>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span className="ad-num">#{ai + 1}</span>
+                            <strong style={{ fontSize: 13 }}>{lang === "tr" ? `Reklam Kalemi ${ai + 1}` : `${ai + 1}-ئېلان كارتىسى`}</strong>
+                          </div>
+                          <button
+                            className="btn ghost"
+                            style={{ padding: "4px 8px", fontSize: 12, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
+                            onClick={() => handleDeletePromoAd(ad.id)}
+                            title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
+                          >
+                            🗑️
+                          </button>
                         </div>
 
                         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
