@@ -148,6 +148,7 @@ export default function Dashboard({
   const [editablePromoAds, setEditablePromoAds] = useState<PromoAdItem[]>(() =>
     promoAds && promoAds.length > 0 ? promoAds : defaultFallbackAds
   );
+  const [editingAdIndex, setEditingAdIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (promoAds && promoAds.length > 0) {
@@ -1311,51 +1312,89 @@ export default function Dashboard({
                   <div className="cms-ads-list">
                     {editablePromoAds.map((ad, ai) => (
                       <div className="cms-ad-card-box" key={ad.id || ai}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <span className="ad-num">#{ai + 1}</span>
                             <strong style={{ fontSize: 13 }}>{lang === "tr" ? `Reklam Kalemi ${ai + 1}` : `${ai + 1}-ئېلان كارتىسى`}</strong>
                           </div>
-                          <button
-                            className="btn ghost"
-                            style={{ padding: "4px 8px", fontSize: 12, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
-                            onClick={() => handleDeletePromoAd(ad.id)}
-                            title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
-                          >
-                            🗑️
-                          </button>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                          <img src={ad.image} alt="" className="ad-thumb-preview" />
-                          <div style={{ flex: 1, display: "grid", gap: 6 }}>
-                            <input
-                              value={ad.text}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setEditablePromoAds((prev) =>
-                                  prev.map((x, idx) => (idx === ai ? { ...x, text: val } : x))
-                                );
-                              }}
-                              className="dash-input"
-                              placeholder="ئېلان تېكىستى..."
-                            />
-                            <label className="ad-file-upload-btn">
-                              📁 {lang === "tr" ? "Görsel Değiştir" : "رەسىم يۈكلەش"}
-                              <input
-                                type="file"
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                onChange={(e) => handleAdImageUpload(ai, e)}
-                              />
-                            </label>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "4px 10px", fontSize: 12 }}
+                              onClick={() => setEditingAdIndex(editingAdIndex === ai ? null : ai)}
+                            >
+                              {editingAdIndex === ai ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "Düzenle ✏️" : "تەھرىرلەش ✏️")}
+                            </button>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "4px 8px", fontSize: 12, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
+                              onClick={() => handleDeletePromoAd(ad.id)}
+                              title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
+
+                        {/* Collapsed Preview */}
+                        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                          <img src={ad.image} alt="" className="ad-thumb-preview" />
+                          <div style={{ flex: 1, fontSize: 13.5, color: "#e2e8f0", lineHeight: 1.5 }}>
+                            {ad.text}
+                          </div>
+                        </div>
+
+                        {/* Expandable Dedicated Edit Window (ئېلان تەھرىرلەش كۆزنىكى) */}
+                        {editingAdIndex === ai && (
+                          <div className="project-editor-box" style={{ marginTop: 12, borderTop: "1px solid rgba(56, 189, 248, 0.25)", paddingTop: 12 }}>
+                            <h4 style={{ margin: "0 0 10px", color: "var(--accent)", fontSize: 13 }}>
+                              ✏️ {lang === "tr" ? `Reklam ${ai + 1} Düzenleme` : `${ai + 1}-ئېلاننى تەھرىرلەش كۆزنىكى`}
+                            </h4>
+                            <div className="form">
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Reklam Metni / Başlığı:" : "ئېلان تېكىستى ۋە مەزمۇنى:"}</label>
+                                <input
+                                  value={ad.text}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEditablePromoAds((prev) =>
+                                      prev.map((x, idx) => (idx === ai ? { ...x, text: val } : x))
+                                    );
+                                  }}
+                                  className="dash-input"
+                                  placeholder="ئېلان تېكىستى كىرگۈزۈڭ..."
+                                />
+                              </div>
+
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Yeni Görsel Yükle:" : "يېڭى ئېلان رەسىمى يۈكلەش:"}</label>
+                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                  <img src={ad.image} alt="" style={{ width: 80, height: 50, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleAdImageUpload(ai, e)}
+                                    className="dash-file-input"
+                                  />
+                                </div>
+                              </div>
+
+                              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                                <button className="btn" onClick={savePromoAds}>
+                                  💾 {lang === "tr" ? "Bu Reklamı Kaydet ve Sitede Güncelle" : "بۇ ئېلاننى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
+                                </button>
+                                <button className="btn ghost" onClick={() => setEditingAdIndex(null)}>
+                                  ✕ {lang === "tr" ? "Kapat" : "تاقاش"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
 
                     <button className="btn" onClick={savePromoAds} style={{ marginTop: 8 }}>
-                      💾 {lang === "tr" ? "Reklamları Kaydet ve Sitede Yayınla" : "ئېلانلارنى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
+                      💾 {lang === "tr" ? "Tüm Reklamları Kaydet ve Sitede Yayınla" : "بارلىق ئېلانلارنى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
                     </button>
                   </div>
                 </div>
