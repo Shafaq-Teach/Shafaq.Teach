@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { copy, type Lang } from "../i18n";
 
 export interface ProjectItem {
@@ -131,6 +131,18 @@ export default function Dashboard({
   const t = copy[lang];
   const [activeTab, setActiveTab] = useState<"overview" | "kanban" | "leads" | "cms" | "invoices" | "pos" | "settings">("overview");
   const [langOpen, setLangOpen] = useState(false);
+  const [dashMenuOpen, setDashMenuOpen] = useState(false);
+  const langBox = useRef<HTMLDivElement>(null);
+  const dashNavBox = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (!langBox.current?.contains(e.target as Node)) setLangOpen(false);
+      if (!dashNavBox.current?.contains(e.target as Node)) setDashMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
 
   // Local state for editing promo ads in CMS
   const [editablePromoAds, setEditablePromoAds] = useState<PromoAdItem[]>(() =>
@@ -360,17 +372,8 @@ export default function Dashboard({
               whiteSpace: "nowrap",
             }}
           >
-            {/* 1. Back to Public Website */}
-            <button
-              className="btn dash-back-btn"
-              style={{ padding: "8px 14px", fontSize: "13px", whiteSpace: "nowrap", flexShrink: 0 }}
-              onClick={onBackToSite}
-            >
-              🌐 {lang === "tr" ? "Siteye Dön" : lang === "en" ? "Website" : lang === "ar" ? "الموقع" : "ئالدى بەت"}
-            </button>
-
-            {/* 2. Language Dropdown */}
-            <div className="lang-dd" style={{ flexShrink: 0 }}>
+            {/* 1. Language Dropdown */}
+            <div className="lang-dd" ref={langBox} style={{ flexShrink: 0 }}>
               <button
                 className={"ctl" + (langOpen ? " on" : "")}
                 style={{ padding: "8px 12px", fontSize: "13px", flexShrink: 0 }}
@@ -394,6 +397,32 @@ export default function Dashboard({
                 ))}
               </div>
             </div>
+
+            {/* 2. Eye Icon Button (Back to Public Site - No text, only eye icon) - on left of Language */}
+            <button
+              className="icon-btn dash-eye-btn"
+              title={lang === "tr" ? "Siteye Dön" : lang === "en" ? "View Site" : lang === "ar" ? "الموقع" : "ئالدى بەتنى كۆرۈش"}
+              aria-label="View Site"
+              style={{
+                flexShrink: 0,
+                width: "40px",
+                height: "40px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(124, 58, 237, 0.25))",
+                border: "1px solid rgba(56, 189, 248, 0.4)",
+                color: "#38bdf8",
+                display: "grid",
+                placeItems: "center",
+                cursor: "pointer",
+                boxShadow: "0 0 14px rgba(56, 189, 248, 0.18)",
+              }}
+              onClick={onBackToSite}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
 
             {/* 3. Theme Toggle */}
             <button
@@ -448,6 +477,92 @@ export default function Dashboard({
             >
               🔒 {lang === "tr" ? "Çıkış" : lang === "en" ? "Logout" : lang === "ar" ? "خروج" : "چىقىش"}
             </button>
+
+            {/* 6. Dashboard Tabs Navigation Dropdown - on left side of Logout button */}
+            <div className="dash-nav-dd" ref={dashNavBox} style={{ position: "relative", flexShrink: 0 }}>
+              <button
+                className={"ctl dash-nav-dd-btn" + (dashMenuOpen ? " on" : "")}
+                style={{
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  borderRadius: "999px",
+                  background: "linear-gradient(120deg, #0284c7, #38bdf8)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(56, 189, 248, 0.4)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                }}
+                onClick={() => setDashMenuOpen((v) => !v)}
+              >
+                <span>
+                  {activeTab === "overview" ? "📊 " + t.dash.navOverview :
+                   activeTab === "kanban" ? "📋 " + t.dash.navKanban :
+                   activeTab === "leads" ? "✉️ " + t.dash.navLeads :
+                   activeTab === "cms" ? "🎨 " + t.dash.navCms :
+                   activeTab === "invoices" ? "🧾 " + t.dash.navInvoices :
+                   activeTab === "pos" ? "🖨️ " + t.dash.navPos :
+                   "⚙️ " + t.dash.navSettings}
+                </span>
+                <span className={"caret" + (dashMenuOpen ? " up" : "")}>▾</span>
+              </button>
+
+              <div className={"dash-nav-menu" + (dashMenuOpen ? " open" : "")}>
+                <button
+                  className={activeTab === "overview" ? "on" : ""}
+                  onClick={() => { setActiveTab("overview"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">📊</span>
+                  <span className="tab-tx">{t.dash.navOverview}</span>
+                </button>
+                <button
+                  className={activeTab === "kanban" ? "on" : ""}
+                  onClick={() => { setActiveTab("kanban"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">📋</span>
+                  <span className="tab-tx">{t.dash.navKanban}</span>
+                </button>
+                <button
+                  className={activeTab === "leads" ? "on" : ""}
+                  onClick={() => { setActiveTab("leads"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">✉️</span>
+                  <span className="tab-tx">{t.dash.navLeads}</span>
+                  <span className="dash-pill-count">{leads.length}</span>
+                </button>
+                <button
+                  className={activeTab === "cms" ? "on" : ""}
+                  onClick={() => { setActiveTab("cms"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">🎨</span>
+                  <span className="tab-tx">{t.dash.navCms}</span>
+                </button>
+                <button
+                  className={activeTab === "invoices" ? "on" : ""}
+                  onClick={() => { setActiveTab("invoices"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">🧾</span>
+                  <span className="tab-tx">{t.dash.navInvoices}</span>
+                </button>
+                <button
+                  className={activeTab === "pos" ? "on" : ""}
+                  onClick={() => { setActiveTab("pos"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">🖨️</span>
+                  <span className="tab-tx">{t.dash.navPos}</span>
+                  <span className="dash-pill-online">●</span>
+                </button>
+                <button
+                  className={activeTab === "settings" ? "on" : ""}
+                  onClick={() => { setActiveTab("settings"); setDashMenuOpen(false); }}
+                >
+                  <span className="tab-ic">⚙️</span>
+                  <span className="tab-tx">{t.dash.navSettings}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </header>

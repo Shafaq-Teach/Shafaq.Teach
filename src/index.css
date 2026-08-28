@@ -980,6 +980,14 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 .dash-header-controls {
   display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; flex-shrink: 0;
 }
+.dash-eye-btn {
+  transition: all 0.2s ease;
+}
+.dash-eye-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 20px var(--glow);
+  transform: scale(1.05);
+}
 .dash-logout-pill-btn {
   padding: 8px 14px; border-radius: 999px;
   border: 1px solid rgba(239, 68, 68, 0.4) !important; background: rgba(239, 68, 68, 0.12) !important;
@@ -990,6 +998,72 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 }
 .dash-logout-pill-btn:hover {
   background: #ef4444 !important; color: #fff !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+
+/* DASHBOARD NAVIGATION DROPDOWN */
+.dash-nav-dd {
+  position: relative;
+}
+.dash-nav-dd-btn {
+  animation: navPulse 5s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+.dash-nav-menu {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: rgba(6, 12, 44, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 16px;
+  padding: 6px;
+  display: grid;
+  gap: 4px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  z-index: 60;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+.dash-nav-menu.open {
+  max-height: 440px;
+  opacity: 1;
+  pointer-events: auto;
+}
+.dash-nav-menu button {
+  border: 0;
+  background: transparent;
+  color: #f1f5f9;
+  text-align: start;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.dash-nav-menu button:hover {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent);
+}
+.dash-nav-menu button.on {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #020624;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+}
+.dash-nav-menu .tab-ic {
+  font-size: 15px;
+}
+.dash-nav-menu .tab-tx {
+  flex: 1;
 }
 
 .dash-layout {
