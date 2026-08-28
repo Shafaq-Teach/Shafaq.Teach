@@ -1005,9 +1005,36 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 .dash-nav-dd {
   position: relative;
 }
-.dash-nav-dd-btn {
-  animation: navPulse 5s ease-in-out infinite;
-  background-size: 200% 200%;
+.dash-menu-icon-btn {
+  transition: all 0.25s ease;
+}
+.dash-menu-icon-btn:hover {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.45) !important;
+  transform: scale(1.06);
+}
+.dash-menu-icon-btn .dash-menu-bar {
+  width: 18px;
+  height: 2.4px;
+  background-color: #00f0ff;
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.7);
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dash-menu-icon-btn.open {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(2, 132, 199, 0.45)) !important;
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.5) !important;
+}
+.dash-menu-icon-btn.open .dash-menu-bar:nth-child(1) {
+  transform: translateY(6.4px) rotate(45deg);
+}
+.dash-menu-icon-btn.open .dash-menu-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.dash-menu-icon-btn.open .dash-menu-bar:nth-child(3) {
+  transform: translateY(-6.4px) rotate(-45deg);
 }
 .dash-nav-menu {
   position: absolute;

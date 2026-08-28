@@ -478,35 +478,35 @@ export default function Dashboard({
               🔒 {lang === "tr" ? "Çıkış" : lang === "en" ? "Logout" : lang === "ar" ? "خروج" : "چىقىش"}
             </button>
 
-            {/* 6. Dashboard Tabs Navigation Dropdown - on left side of Logout button */}
+            {/* 6. Dashboard Tabs Navigation Dropdown (Icon Only - Glowing Hamburger Menu) - on left side of Logout button */}
             <div className="dash-nav-dd" ref={dashNavBox} style={{ position: "relative", flexShrink: 0 }}>
               <button
-                className={"ctl dash-nav-dd-btn" + (dashMenuOpen ? " on" : "")}
+                className={"icon-btn dash-menu-icon-btn" + (dashMenuOpen ? " open" : "")}
+                title={t.dash.title}
+                aria-label="Dashboard Menu"
                 style={{
-                  padding: "8px 14px",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  borderRadius: "999px",
-                  background: "linear-gradient(120deg, #0284c7, #38bdf8)",
-                  color: "#ffffff",
-                  border: "1px solid rgba(56, 189, 248, 0.4)",
-                  display: "inline-flex",
+                  flexShrink: 0,
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(2, 132, 199, 0.28))",
+                  border: "1px solid rgba(56, 189, 248, 0.45)",
+                  color: "#00f0ff",
+                  display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
-                  gap: "6px",
+                  justifyContent: "center",
+                  gap: "4px",
+                  padding: 0,
                   cursor: "pointer",
+                  boxShadow: "0 0 16px rgba(0, 240, 255, 0.22)",
+                  transition: "all 0.2s ease",
                 }}
                 onClick={() => setDashMenuOpen((v) => !v)}
               >
-                <span>
-                  {activeTab === "overview" ? "📊 " + t.dash.navOverview :
-                   activeTab === "kanban" ? "📋 " + t.dash.navKanban :
-                   activeTab === "leads" ? "✉️ " + t.dash.navLeads :
-                   activeTab === "cms" ? "🎨 " + t.dash.navCms :
-                   activeTab === "invoices" ? "🧾 " + t.dash.navInvoices :
-                   activeTab === "pos" ? "🖨️ " + t.dash.navPos :
-                   "⚙️ " + t.dash.navSettings}
-                </span>
-                <span className={"caret" + (dashMenuOpen ? " up" : "")}>▾</span>
+                <span className="dash-menu-bar" />
+                <span className="dash-menu-bar" />
+                <span className="dash-menu-bar" />
               </button>
 
               <div className={"dash-nav-menu" + (dashMenuOpen ? " open" : "")}>
