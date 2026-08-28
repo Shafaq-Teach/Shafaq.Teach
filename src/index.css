@@ -992,8 +992,7 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 1;
-  min-width: 0;
+  flex-shrink: 0;
 }
 .dash-badge {
   background: linear-gradient(135deg, #7c3aed, #ea580c);
@@ -1006,12 +1005,10 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   flex-shrink: 0;
 }
 .dash-title {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   margin: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .dash-header-controls {
@@ -1261,57 +1258,52 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
   }
   .dash-brand-block {
     gap: 6px;
+    flex-shrink: 0;
   }
   .dash-title {
     font-size: 14.5px;
-    max-width: 120px;
+    white-space: nowrap;
   }
   .dash-header-controls {
     gap: 4px;
-  }
-  .dash-header-controls .ctl {
-    padding: 6px 8px;
-    font-size: 12px;
+    flex-shrink: 0;
   }
   .dash-eye-btn,
+  .dash-lang-globe-btn,
+  .dash-logout-icon-btn,
   .dash-header-controls .icon-btn,
   .dash-menu-icon-btn {
     width: 34px;
     height: 34px;
     border-radius: 10px;
   }
-  .dash-logout-pill-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
 }
 
 @media (max-width: 480px) {
+  .dash-brand-block {
+    gap: 4px;
+    flex-shrink: 0;
+  }
   .dash-title {
     font-size: 13.5px;
-    max-width: 95px;
+    white-space: nowrap;
   }
   .dash-badge {
-    font-size: 9.5px;
-    padding: 2px 5px;
+    font-size: 9px;
+    padding: 2px 4px;
   }
   .dash-header-controls {
     gap: 3px;
-  }
-  .dash-header-controls .ctl {
-    padding: 5px 6px;
-    font-size: 11px;
+    flex-shrink: 0;
   }
   .dash-eye-btn,
+  .dash-lang-globe-btn,
+  .dash-logout-icon-btn,
   .dash-header-controls .icon-btn,
   .dash-menu-icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
-  }
-  .dash-logout-pill-btn {
-    padding: 5px 8px;
-    font-size: 11px;
   }
   .dash-kpi-card {
     padding: 14px;
