@@ -160,12 +160,18 @@ button { font: inherit; cursor: pointer; }
   border: 1.5px solid rgba(124, 58, 237, 0.45);
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(192, 132, 252, 0.25));
   color: #fff;
-  display: grid;
-  place-items: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   cursor: pointer;
   box-shadow: 0 0 14px rgba(124, 58, 237, 0.25);
   transition: all 0.22s ease;
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.lang-globe-btn svg {
+  display: block;
+  margin: auto;
 }
 .lang-globe-btn:hover,
 .lang-globe-btn.on {

@@ -710,12 +710,16 @@ export default function App() {
           <div className="controls">
             <div className="lang-dd" ref={langBox}>
               <button
-                className={"ctl lang-globe-btn" + (langOpen ? " on" : "")}
+                className={"icon-btn lang-globe-btn" + (langOpen ? " on" : "")}
                 onClick={() => setLangOpen((v) => !v)}
                 title="تىل تاللاش / Language"
                 aria-label="Language Selector"
               >
-                <span className="globe-icon" style={{ fontSize: 17, display: "inline-block" }}>🌐</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                  <path d="M2 12h20" />
+                </svg>
               </button>
               <div className={"lang-menu" + (langOpen ? " open" : "")}>
                 {(["ug", "tr", "en", "ar"] as Lang[]).map((l) => (
