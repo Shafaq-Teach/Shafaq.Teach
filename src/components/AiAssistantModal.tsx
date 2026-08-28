@@ -229,7 +229,7 @@ export default function AiAssistantModal({
       >
         <span className="ai-launcher-pulse" />
         <span className="ai-launcher-icon">
-          <img src="/media/icon-ai-white.png" alt="AI" className="ai-launcher-icon-img" />
+          <img src="media/icon-ai-white.png" alt="AI" className="ai-launcher-icon-img" />
         </span>
         <span className="ai-launcher-badge">{lbl.floatingBadge}</span>
       </button>
@@ -248,7 +248,7 @@ export default function AiAssistantModal({
             <div className="ai-chat-header">
               <div className="ai-header-info">
                 <div className="ai-avatar-badge">
-                  <img src="/media/icon-ai-white.png" alt="AI" className="ai-header-icon-img" />
+                  <img src="media/icon-ai-white.png" alt="AI" className="ai-header-icon-img" />
                   <span className="ai-live-dot" />
                 </div>
                 <div>
@@ -285,7 +285,7 @@ export default function AiAssistantModal({
                 <div key={m.id} className={"ai-msg-row " + m.sender}>
                   {m.sender === "ai" && (
                     <div className="ai-bubble-avatar">
-                      <img src="/media/icon-ai-white.png" alt="AI" className="ai-avatar-img" />
+                      <img src="media/icon-ai-white.png" alt="AI" className="ai-avatar-img" />
                     </div>
                   )}
                   <div className="ai-bubble-content">
@@ -329,7 +329,7 @@ export default function AiAssistantModal({
                           onClick={() => handleActionClick("whatsapp")}
                         >
                           <img
-                            src="/media/icon-whatsapp.png"
+                            src="media/icon-whatsapp.png"
                             alt="WhatsApp"
                             className="ai-btn-icon-img"
                           />
@@ -346,7 +346,7 @@ export default function AiAssistantModal({
               {isTyping && (
                 <div className="ai-msg-row ai">
                   <div className="ai-bubble-avatar">
-                    <img src="/media/icon-ai-white.png" alt="AI" className="ai-avatar-img" />
+                    <img src="media/icon-ai-white.png" alt="AI" className="ai-avatar-img" />
                   </div>
                   <div className="ai-typing-indicator">
                     <span className="dot" />

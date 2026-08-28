@@ -11,20 +11,20 @@ import Dashboard, {
 import AdminAuthModal, { type AdminCredentials } from "./components/AdminAuthModal";
 import AiAssistantModal from "./components/AiAssistantModal";
 
-const logo = "/media/logo-v3.jpeg";
-const heroTech = "/media/hero-v3.jpg?v=9";
-const aboutBg = "/media/about-v1.jpg";
+const logo = "media/logo-v3.jpeg";
+const heroTech = "media/hero-v3.jpg?v=9";
+const aboutBg = "media/about-v1.jpg";
 
 const WORK_NAME_COLORS = ["#14532d", "#7c2d12", "#1e3a8a", "#6b21a8"];
 const WORK_DESC_COLORS = ["#0369a1", "#b45309", "#0f766e", "#be123c"];
 
 const stepImgs = [
-  "/media/step-1.jpg",
-  "/media/step-2.jpg",
-  "/media/step-3.jpg",
-  "/media/step-4.jpg",
-  "/media/step-5.jpg",
-  "/media/step-6.jpg",
+  "media/step-1.jpg",
+  "media/step-2.jpg",
+  "media/step-3.jpg",
+  "media/step-4.jpg",
+  "media/step-5.jpg",
+  "media/step-6.jpg",
 ];
 
 const navPaint = [
@@ -106,17 +106,17 @@ const defaultPromoAds: PromoAdItem[] = [
   {
     id: "ad-1",
     text: "يېڭى: كۆپ تىللىق ئاشخانا POS — بىر ھەپتە ئىچىدە ئورنىتىش",
-    image: "/media/pos-v4.jpg",
+    image: "media/pos-v4.jpg",
   },
   {
     id: "ad-2",
     text: "تور بەت + ئاندىروئىد ئەپ بىرلىكتە 20% ئېتىبار",
-    image: "/media/shop-v4.jpg",
+    image: "media/shop-v4.jpg",
   },
   {
     id: "ad-3",
     text: "ئىشخانا ئاپتوماتلاشتۇرۇش: Excel دىن سىستېمىغا بىخەتەر كۆچۈرۈش",
-    image: "/media/hero-v3.jpg",
+    image: "media/hero-v3.jpg",
   },
 ];
 
@@ -127,7 +127,7 @@ const defaultShowcaseProjects: ShowcaseProject[] = [
     title: "كۆپ تىللىق ئەقلىي ئاشخانا ۋە QR زاكاز سىستېمىسى",
     desc: "كۆپ تىللىق زاكاز ۋە ئاشپەز ئېكرانى",
     category: "ئاشخانا ۋە مېھمانساراي تېخنىكىسى",
-    image: "/media/pos-v4.jpg",
+    image: "media/pos-v4.jpg",
     tags: ["React", "TypeScript", "QR Menu", "KDS Display", "Thermal Print"],
     nameColor: "#14532d",
     descColor: "#0369a1",
@@ -138,7 +138,7 @@ const defaultShowcaseProjects: ShowcaseProject[] = [
     title: "RTL زامانىۋى تور دۇكىنى ۋە ئېلېكترونلۇق سودا سۇپىسى",
     desc: "RTL تور دۇكىنى ۋە باشقۇرۇش",
     category: "تور سودا ۋە ئېلېكترونلۇق تىجارەت",
-    image: "/media/shop-v4.jpg",
+    image: "media/shop-v4.jpg",
     tags: ["Next.js", "React", "Tailwind CSS", "Cart & Checkout", "Admin Panel"],
     nameColor: "#7c2d12",
     descColor: "#b45309",
@@ -149,7 +149,7 @@ const defaultShowcaseProjects: ShowcaseProject[] = [
     title: "شىركەت ۋە سودا ئورۇنلىرىنىڭ كۆرۈنمە كىملىك (VI) لايىھەسى",
     desc: "لوگو + قوللانما + سوتسىيال",
     category: "گرافىك لايىھە ۋە ماركا كىملىكى",
-    image: "/media/brand-v3.jpg",
+    image: "media/brand-v3.jpg",
     tags: ["Logo Design", "Brand Identity", "Brand Guidelines", "Social Assets"],
     nameColor: "#1e3a8a",
     descColor: "#0f766e",
@@ -160,7 +160,7 @@ const defaultShowcaseProjects: ShowcaseProject[] = [
     title: "ئىشخانا ئاپتوماتلاشتۇرۇش ۋە كارخانا ئامبار-ھېسابات سىستېمىسى",
     desc: "ئامبار ۋە ھېسابات ئېقىمى",
     category: "ئىشخانا يۇمشاق دېتالى ۋە ئاپتوماتلاشتۇرۇش",
-    image: "/media/erp-v3.jpg",
+    image: "media/erp-v3.jpg",
     tags: ["Python", "Automation", "Excel Importer", "Inventory Ledger"],
     nameColor: "#6b21a8",
     descColor: "#be123c",
@@ -178,7 +178,8 @@ export default function App() {
   const [mode, setMode] = useState<Mode>(() => (localStorage.getItem("mode") as Mode) || "dark");
   const [page, setPage] = useState("home");
   const [langOpen, setLangOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
 
   // Authentication State
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
@@ -436,7 +437,12 @@ export default function App() {
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (!langBox.current?.contains(e.target as Node)) setLangOpen(false);
-      if (!navBox.current?.contains(e.target as Node)) setMenuOpen(false);
+      if (
+        !mobileNavRef.current?.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest(".mobile-menu-btn")
+      ) {
+        setMobileMenuOpen(false);
+      }
     };
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
@@ -563,7 +569,7 @@ export default function App() {
   return (
     <div className="app">
       {/* Top Ticker */}
-      <header className="nav" ref={navBox}>
+      <header className="nav">
         <div className="ticker">
           <div className="ticker-track">
             {rollingAds.map((ad, i) => (
@@ -574,11 +580,20 @@ export default function App() {
           </div>
         </div>
         <div className="wrap nav-in">
-          <a className="brand" href="#home" onClick={() => setPage("home")}>
-            <img className="logo" src={logo} alt={displayBrand} width={52} height={52} />
+          <a
+            className="brand"
+            href="#home"
+            onClick={() => {
+              setPage("home");
+              setMobileMenuOpen(false);
+            }}
+          >
+            <img className="logo" src={logo} alt={displayBrand} width={46} height={46} />
             <span className="brand-name">{displayBrand}</span>
           </a>
-          <nav className={"nav-links" + (menuOpen ? " open" : "")}>
+
+          {/* Desktop Navigation Links */}
+          <nav className="nav-links desktop-nav">
             {nav.map(([id, label], i) => (
               <a
                 key={id}
@@ -590,11 +605,10 @@ export default function App() {
                   backgroundImage: navPaint[i]?.bg || "linear-gradient(120deg,#d97706,#f59e0b)",
                   backgroundSize: "220% 220%",
                   animation: `navPulse 4.5s ease-in-out ${i * 0.35}s infinite, navInk 3.2s ease-in-out ${i * 0.25}s infinite`,
-                  padding: "8px 12px",
+                  padding: "8px 14px",
                   borderRadius: 999,
                 }}
                 onClick={(e) => {
-                  setMenuOpen(false);
                   if (id === "dashboard") {
                     e.preventDefault();
                     handleOpenDashboardClick();
@@ -607,6 +621,8 @@ export default function App() {
               </a>
             ))}
           </nav>
+
+          {/* Header Controls & Mobile Toggle */}
           <div className="controls">
             <div className="lang-dd" ref={langBox}>
               <button className={"ctl" + (langOpen ? " on" : "")} onClick={() => setLangOpen((v) => !v)}>
@@ -638,17 +654,92 @@ export default function App() {
             <button className="icon-btn mode-btn" onClick={() => setMode(mode === "dark" ? "light" : "dark")}>
               {mode === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
+
+            {/* Mobile Menu Hamburger Button */}
             <button
-              className={"icon-btn menu-btn" + (menuOpen ? " open" : "")}
-              aria-expanded={menuOpen}
-              aria-label={
-                lang === "tr" ? "Menü" : lang === "en" ? "Menu" : lang === "ar" ? "القائمة" : "تىزىملىك"
-              }
-              title={lang === "tr" ? "Menü" : lang === "en" ? "Menu" : lang === "ar" ? "القائمة" : "تىزىملىك"}
-              onClick={() => setMenuOpen((v) => !v)}
+              className={"mobile-menu-btn" + (mobileMenuOpen ? " open" : "")}
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-label="Toggle Menu"
+              title="Menu"
             >
-              {menuOpen ? "✕" : "☰"}
+              <span className="bar top-bar" />
+              <span className="bar mid-bar" />
+              <span className="bar bot-bar" />
             </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Navigation Menu */}
+        <div
+          ref={mobileNavRef}
+          className={"mobile-dropdown-menu" + (mobileMenuOpen ? " open" : "")}
+        >
+          <div className="mobile-dropdown-inner">
+            <div className="mobile-dropdown-header">
+              <span className="mobile-menu-label">
+                {lang === "ug" ? "بەت بۆلەكلىرى" : lang === "ar" ? "قائمة الصفحات" : lang === "tr" ? "Sayfa Menüsü" : "Navigation"}
+              </span>
+              <button
+                className="mobile-close-btn"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <nav className="mobile-nav-items">
+              {nav.map(([id, label]) => {
+                const icon =
+                  id === "home" ? "🏠" :
+                  id === "about" ? "ℹ️" :
+                  id === "services" ? "⚡" :
+                  id === "work" ? "💼" :
+                  id === "process" ? "🔄" :
+                  id === "contact" ? "📞" : "⚙️";
+                return (
+                  <a
+                    key={id}
+                    href={id === "dashboard" ? "#dashboard" : "#" + id}
+                    className={"mobile-nav-item" + (page === id ? " active" : "")}
+                    onClick={(e) => {
+                      setMobileMenuOpen(false);
+                      if (id === "dashboard") {
+                        e.preventDefault();
+                        handleOpenDashboardClick();
+                      } else {
+                        setPage(id);
+                      }
+                    }}
+                  >
+                    <span className="mobile-nav-icon">{icon}</span>
+                    <span className="mobile-nav-text">{label.replace("⚙️ ", "")}</span>
+                    <span className="mobile-nav-arrow">{dir === "rtl" ? "❮" : "❯"}</span>
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Quick action shortcuts in mobile drawer */}
+            <div className="mobile-dropdown-footer">
+              <a
+                href={`https://wa.me/${rawWhatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-quick-link wa"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>💬 WhatsApp</span>
+              </a>
+              <a
+                href={`https://t.me/${rawTelegram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-quick-link tg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>✈️ Telegram</span>
+              </a>
+            </div>
           </div>
         </div>
       </header>
@@ -975,7 +1066,7 @@ export default function App() {
                 rel="noreferrer"
                 className="direct-btn wa-btn"
               >
-                <img src="/media/icon-whatsapp.png" alt="WhatsApp" className="contact-icon-img" />
+                <img src="media/icon-whatsapp.png" alt="WhatsApp" className="contact-icon-img" />
                 <span>{t.whatsappBtn}</span>
               </a>
               <a
@@ -984,14 +1075,14 @@ export default function App() {
                 rel="noreferrer"
                 className="direct-btn tg-btn"
               >
-                <img src="/media/icon-telegram.png" alt="Telegram" className="contact-icon-img" />
+                <img src="media/icon-telegram.png" alt="Telegram" className="contact-icon-img" />
                 <span>{t.telegramBtn}</span>
               </a>
               <a
                 href={`tel:${rawWhatsapp || "8613000000000"}`}
                 className="direct-btn phone-btn"
               >
-                <img src="/media/icon-phone.png" alt="Phone" className="contact-icon-img" />
+                <img src="media/icon-phone.png" alt="Phone" className="contact-icon-img" />
                 <span>{t.phoneCallBtn || "تېلېفون قىلىش"}</span>
               </a>
               <button
@@ -1255,7 +1346,7 @@ export default function App() {
           className="float-btn float-phone"
           title={t.phoneCallBtn || "Telephone"}
         >
-          <img src="/media/icon-phone.png" alt="Phone" className="float-icon-img" />
+          <img src="media/icon-phone.png" alt="Phone" className="float-icon-img" />
         </a>
         <a
           href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
@@ -1264,7 +1355,7 @@ export default function App() {
           className="float-btn float-wa"
           title="WhatsApp"
         >
-          <img src="/media/icon-whatsapp.png" alt="WhatsApp" className="float-icon-img" />
+          <img src="media/icon-whatsapp.png" alt="WhatsApp" className="float-icon-img" />
         </a>
         <a
           href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
@@ -1273,7 +1364,7 @@ export default function App() {
           className="float-btn float-tg"
           title="Telegram"
         >
-          <img src="/media/icon-telegram.png" alt="Telegram" className="float-icon-img" />
+          <img src="media/icon-telegram.png" alt="Telegram" className="float-icon-img" />
         </a>
       </aside>
     </div>

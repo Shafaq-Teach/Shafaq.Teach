@@ -65,17 +65,17 @@ const defaultFallbackAds: PromoAdItem[] = [
   {
     id: "ad-1",
     text: "يېڭى: كۆپ تىللىق ئاشخانا POS — بىر ھەپتە ئىچىدە ئورنىتىش",
-    image: "/media/pos-v4.jpg",
+    image: "media/pos-v4.jpg",
   },
   {
     id: "ad-2",
     text: "تور بەت + ئاندىروئىد ئەپ بىرلىكتە 20% ئېتىبار",
-    image: "/media/shop-v4.jpg",
+    image: "media/shop-v4.jpg",
   },
   {
     id: "ad-3",
     text: "ئىشخانا ئاپتوماتلاشتۇرۇش: Excel دىن سىستېمىغا بىخەتەر كۆچۈرۈش",
-    image: "/media/hero-v3.jpg",
+    image: "media/hero-v3.jpg",
   },
 ];
 
@@ -855,7 +855,7 @@ export default function Dashboard({
                               className="dash-action-btn wa-act"
                               title="WhatsApp"
                             >
-                              <img src="/media/icon-whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18, verticalAlign: "middle" }} />
+                              <img src="media/icon-whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18, verticalAlign: "middle" }} />
                             </a>
                             <button
                               className="dash-action-btn"
