@@ -261,12 +261,42 @@ export default function App() {
 
   const [promoIndex, setPromoIndex] = useState(0);
 
+  const isMobileScreen = () => typeof window !== "undefined" && window.innerWidth <= 768;
+
   const handlePrevPromo = () => {
-    setPromoIndex((prev) => (prev <= 0 ? Math.max(0, promoAds.length - 1) : prev - 1));
+    if (!promoAds || promoAds.length <= 1) return;
+    const isMob = isMobileScreen();
+    const total = promoAds.length;
+
+    if (isMob) {
+      // 📱 Mobile: Slide 1 card at a time
+      setPromoIndex((prev) => (prev <= 0 ? total - 1 : prev - 1));
+    } else {
+      // 💻 Desktop/PC: Slide 2 cards at a time
+      const maxIdx = Math.max(0, total - 2);
+      setPromoIndex((prev) => {
+        if (prev <= 0) return maxIdx;
+        return Math.max(0, prev - 2);
+      });
+    }
   };
 
   const handleNextPromo = () => {
-    setPromoIndex((prev) => (prev >= promoAds.length - 1 ? 0 : prev + 1));
+    if (!promoAds || promoAds.length <= 1) return;
+    const isMob = isMobileScreen();
+    const total = promoAds.length;
+
+    if (isMob) {
+      // 📱 Mobile: Slide 1 card at a time
+      setPromoIndex((prev) => (prev >= total - 1 ? 0 : prev + 1));
+    } else {
+      // 💻 Desktop/PC: Slide 2 cards at a time
+      const maxIdx = Math.max(0, total - 2);
+      setPromoIndex((prev) => {
+        if (prev >= maxIdx) return 0;
+        return Math.min(maxIdx, prev + 2);
+      });
+    }
   };
 
   const updatePromoAds = (newAds: PromoAdItem[]) => {
