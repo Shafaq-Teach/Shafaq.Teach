@@ -4,6 +4,7 @@ import { copy, type Lang } from "../i18n";
 export interface AdminCredentials {
   username: string;
   passwordHash: string;
+  token?: string;
 }
 
 interface AdminAuthModalProps {
@@ -13,7 +14,7 @@ interface AdminAuthModalProps {
   onSuccess: () => void;
   onShowToast: (msg: string) => void;
   credentials: AdminCredentials;
-  onUpdateCredentials: (creds: AdminCredentials) => void;
+  onUpdateCredentials: (creds: AdminCredentials) => void | Promise<void>;
 }
 
 export default function AdminAuthModal({
@@ -48,6 +49,9 @@ export default function AdminAuthModal({
     // STRICT CHECK: ONLY match the real active credentials
     if (cleanUser === credentials.username && cleanPass === credentials.passwordHash) {
       localStorage.setItem("shafaq_admin_auth", "true");
+      if (credentials.token) {
+        localStorage.setItem("shafaq_admin_token", credentials.token);
+      }
       onShowToast(`✨ ${t.auth.loginSuccess}`);
       onSuccess();
     } else {

@@ -200,3 +200,51 @@ export async function syncCloudSettings(settings: StudioSettings) {
     console.warn("Supabase sync settings error:", err);
   }
 }
+
+export interface CloudAdminCreds {
+  username: string;
+  passwordHash: string;
+  token: string;
+}
+
+// 5. Admin Credentials Cloud Sync
+export async function getCloudAdminCredentials(): Promise<CloudAdminCreds | null> {
+  try {
+    const { data, error } = await supabase
+      .from("admin_credentials")
+      .select("*")
+      .eq("id", "main_admin")
+      .single();
+    if (error) throw error;
+    if (data) {
+      return {
+        username: data.username || "admin",
+        passwordHash: data.password_hash || "admin123",
+        token: data.token || "default-token",
+      };
+    }
+  } catch (err) {
+    console.warn("Supabase admin_credentials read fallback:", err);
+  }
+  return null;
+}
+
+export async function syncCloudAdminCredentials(username: string, passwordHash: string): Promise<string | null> {
+  try {
+    const newToken = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const row = {
+      id: "main_admin",
+      username: username || "admin",
+      password_hash: passwordHash,
+      token: newToken,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await supabase.from("admin_credentials").upsert(row);
+    if (error) throw error;
+    return newToken;
+  } catch (err) {
+    console.warn("Supabase admin_credentials sync error:", err);
+    return null;
+  }
+}
+

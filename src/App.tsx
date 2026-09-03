@@ -19,6 +19,8 @@ import {
   syncCloudLeads,
   getCloudSettings,
   syncCloudSettings,
+  getCloudAdminCredentials,
+  syncCloudAdminCredentials,
   supabase,
 } from "./supabase";
 
@@ -209,12 +211,17 @@ export default function App() {
     } catch {
       // fallback
     }
-    return { username: "admin", passwordHash: "admin123" };
+    return { username: "admin", passwordHash: "admin123", token: "" };
   });
 
-  const updateCredentials = (creds: AdminCredentials) => {
-    setCredentials(creds);
-    localStorage.setItem("shafaq_admin_credentials", JSON.stringify(creds));
+  const updateCredentials = async (creds: AdminCredentials) => {
+    const newToken = await syncCloudAdminCredentials(creds.username, creds.passwordHash);
+    const updated: AdminCredentials = { ...creds, token: newToken || creds.token || "" };
+    setCredentials(updated);
+    localStorage.setItem("shafaq_admin_credentials", JSON.stringify(updated));
+    if (newToken) {
+      localStorage.setItem("shafaq_admin_token", newToken);
+    }
   };
 
   // Modals & Interactive features
@@ -372,6 +379,23 @@ export default function App() {
 
   // 🌐 INITIAL CLOUD DATA FETCH & REALTIME LISTENERS FROM SUPABASE
   useEffect(() => {
+    // 0. Fetch Cloud Admin Credentials & Invalidate Stale Session
+    getCloudAdminCredentials().then((cloudCreds) => {
+      if (cloudCreds) {
+        setCredentials(cloudCreds);
+        localStorage.setItem("shafaq_admin_credentials", JSON.stringify(cloudCreds));
+        const localToken = localStorage.getItem("shafaq_admin_token");
+        const isAuth = localStorage.getItem("shafaq_admin_auth") === "true";
+        if (isAuth && cloudCreds.token && localToken !== cloudCreds.token) {
+          setIsAdminAuthenticated(false);
+          localStorage.removeItem("shafaq_admin_auth");
+          localStorage.removeItem("shafaq_admin_token");
+          sessionStorage.removeItem("shafaq_admin_auth");
+          setPage((prev) => (prev === "dashboard" ? "home" : prev));
+        }
+      }
+    });
+
     // 1. Fetch Cloud Promo Ads
     getCloudPromoAds().then((cloudAds) => {
       if (cloudAds && cloudAds.length > 0) {
@@ -408,6 +432,23 @@ export default function App() {
     try {
       const channel = supabase
         .channel("supabase-realtime-sync")
+        .on("postgres_changes", { event: "*", schema: "public", table: "admin_credentials" }, () => {
+          getCloudAdminCredentials().then((cloudCreds) => {
+            if (cloudCreds) {
+              setCredentials(cloudCreds);
+              localStorage.setItem("shafaq_admin_credentials", JSON.stringify(cloudCreds));
+              const localToken = localStorage.getItem("shafaq_admin_token");
+              if (localToken !== cloudCreds.token) {
+                setIsAdminAuthenticated(false);
+                localStorage.removeItem("shafaq_admin_auth");
+                localStorage.removeItem("shafaq_admin_token");
+                sessionStorage.removeItem("shafaq_admin_auth");
+                setPage((prev) => (prev === "dashboard" ? "home" : prev));
+                showToast("⚠️ مەخپىي نومۇر ئۆزگەرتىلدى. قايتا كىرىڭ.");
+              }
+            }
+          });
+        })
         .on("postgres_changes", { event: "*", schema: "public", table: "promo_ads" }, () => {
           getCloudPromoAds().then((ads) => ads && setPromoAds(ads));
         })
@@ -589,12 +630,16 @@ export default function App() {
   const handleAuthSuccess = () => {
     setIsAdminAuthenticated(true);
     setAuthModalOpen(false);
+    if (credentials.token) {
+      localStorage.setItem("shafaq_admin_token", credentials.token);
+    }
     setPage("dashboard");
   };
 
   const handleLogout = () => {
     setIsAdminAuthenticated(false);
     localStorage.removeItem("shafaq_admin_auth");
+    localStorage.removeItem("shafaq_admin_token");
     sessionStorage.removeItem("shafaq_admin_auth");
     setPage("home");
     showToast(t.auth.loggedOut);
