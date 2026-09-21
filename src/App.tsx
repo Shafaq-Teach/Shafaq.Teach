@@ -629,8 +629,10 @@ export default function App() {
       const search = window.location.search.toLowerCase();
 
       if (path.includes("sensiz520") || hash.includes("sensiz520") || search.includes("sensiz520")) {
-        setPage("dashboard");
-        if (!isAdminAuthenticated) {
+        if (isAdminAuthenticated) {
+          setPage("dashboard");
+        } else {
+          setPage("home");
           setAuthModalOpen(true);
         }
       }
@@ -652,6 +654,19 @@ export default function App() {
       localStorage.setItem("shafaq_admin_token", credentials.token);
     }
     setPage("dashboard");
+  };
+
+  const handleAuthClose = () => {
+    setAuthModalOpen(false);
+    if (!isAdminAuthenticated) {
+      setPage("home");
+      try {
+        const cleanUrl = window.location.origin + window.location.pathname.replace(/\/sensiz520\/?/gi, "/");
+        window.history.replaceState(null, "", cleanUrl);
+      } catch {
+        // ignore
+      }
+    }
   };
 
   const handleLogout = () => {
@@ -724,7 +739,7 @@ export default function App() {
   };
 
   // If dashboard is active and authenticated, render full Dashboard view (SINGLE HEADER INSIDE DASHBOARD)
-  if (page === "dashboard") {
+  if (page === "dashboard" && isAdminAuthenticated) {
     return (
       <div className="app">
         <Suspense
@@ -1424,7 +1439,7 @@ export default function App() {
       <AdminAuthModal
         lang={lang}
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={handleAuthClose}
         onSuccess={handleAuthSuccess}
         onShowToast={showToast}
         credentials={credentials}
