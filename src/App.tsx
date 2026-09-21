@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { copy, type Lang } from "./i18n";
-import Dashboard, {
-  type LeadItem,
-  type ProjectItem,
-  type PosNode,
-  type StudioSettings,
-  type ShowcaseProject,
-  type PromoAdItem,
+import type {
+  LeadItem,
+  ProjectItem,
+  PosNode,
+  StudioSettings,
+  ShowcaseProject,
+  PromoAdItem,
 } from "./components/Dashboard";
+
+const Dashboard = lazy(() => import("./components/Dashboard"));
 import AdminAuthModal, { type AdminCredentials } from "./components/AdminAuthModal";
 import AiAssistantModal from "./components/AiAssistantModal";
 import {
@@ -619,13 +621,29 @@ export default function App() {
     showToast(t.copiedToast);
   };
 
-  const handleOpenDashboardClick = () => {
-    if (isAdminAuthenticated) {
-      setPage("dashboard");
-    } else {
-      setAuthModalOpen(true);
-    }
-  };
+  // 🔒 Secret Route Detection for /sensiz520 or #sensiz520
+  useEffect(() => {
+    const handleSecretRoute = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
+      if (path.includes("sensiz520") || hash.includes("sensiz520") || search.includes("sensiz520")) {
+        setPage("dashboard");
+        if (!isAdminAuthenticated) {
+          setAuthModalOpen(true);
+        }
+      }
+    };
+
+    handleSecretRoute();
+    window.addEventListener("popstate", handleSecretRoute);
+    window.addEventListener("hashchange", handleSecretRoute);
+    return () => {
+      window.removeEventListener("popstate", handleSecretRoute);
+      window.removeEventListener("hashchange", handleSecretRoute);
+    };
+  }, [isAdminAuthenticated]);
 
   const handleAuthSuccess = () => {
     setIsAdminAuthenticated(true);
@@ -642,9 +660,26 @@ export default function App() {
     localStorage.removeItem("shafaq_admin_token");
     sessionStorage.removeItem("shafaq_admin_auth");
     setPage("home");
+    try {
+      const cleanUrl = window.location.origin + window.location.pathname.replace(/\/sensiz520\/?/gi, "/");
+      window.history.replaceState(null, "", cleanUrl);
+    } catch {
+      // ignore
+    }
     showToast(t.auth.loggedOut);
   };
 
+  const handleBackToSite = () => {
+    setPage("home");
+    try {
+      const cleanUrl = window.location.origin + window.location.pathname.replace(/\/sensiz520\/?/gi, "/");
+      window.history.replaceState(null, "", cleanUrl);
+    } catch {
+      // ignore
+    }
+  };
+
+  // Public Navigation Links (Dashboard is completely hidden from public eyes)
   const nav = useMemo(
     () =>
       [
@@ -654,7 +689,6 @@ export default function App() {
         ["work", t.nav.work],
         ["process", t.nav.process],
         ["contact", t.nav.contact],
-        ["dashboard", `⚙️ ${t.nav.dashboard}`],
       ] as const,
     [t],
   );
@@ -693,29 +727,40 @@ export default function App() {
   if (page === "dashboard") {
     return (
       <div className="app">
-        <Dashboard
-          lang={lang}
-          onSetLang={setLang}
-          theme={theme}
-          onCycleTheme={() => setTheme(themes[(themes.indexOf(theme) + 1) % themes.length])}
-          mode={mode}
-          onToggleMode={() => setMode(mode === "dark" ? "light" : "dark")}
-          onBackToSite={() => setPage("home")}
-          onLogout={handleLogout}
-          onShowToast={showToast}
-          promoAds={promoAds}
-          onUpdatePromoAds={updatePromoAds}
-          showcaseProjects={showcaseProjects}
-          onUpdateShowcaseProjects={updateShowcaseProjects}
-          leads={leads}
-          onUpdateLeads={updateLeads}
-          projects={projects}
-          onUpdateProjects={updateProjects}
-          posNodes={posNodes}
-          onUpdatePosNodes={updatePosNodes}
-          settings={settings}
-          onUpdateSettings={updateSettings}
-        />
+        <Suspense
+          fallback={
+            <div className="dash-suspense-wrap">
+              <div className="dash-suspense-spinner" />
+              <p style={{ fontWeight: 600, color: "var(--accent)" }}>
+                {lang === "ug" ? "باشقۇرۇش سۇپىسى يۈكلىنىۋاتىدۇ..." : "Dashboard Loading..."}
+              </p>
+            </div>
+          }
+        >
+          <Dashboard
+            lang={lang}
+            onSetLang={setLang}
+            theme={theme}
+            onCycleTheme={() => setTheme(themes[(themes.indexOf(theme) + 1) % themes.length])}
+            mode={mode}
+            onToggleMode={() => setMode(mode === "dark" ? "light" : "dark")}
+            onBackToSite={handleBackToSite}
+            onLogout={handleLogout}
+            onShowToast={showToast}
+            promoAds={promoAds}
+            onUpdatePromoAds={updatePromoAds}
+            showcaseProjects={showcaseProjects}
+            onUpdateShowcaseProjects={updateShowcaseProjects}
+            leads={leads}
+            onUpdateLeads={updateLeads}
+            projects={projects}
+            onUpdateProjects={updateProjects}
+            posNodes={posNodes}
+            onUpdatePosNodes={updatePosNodes}
+            settings={settings}
+            onUpdateSettings={updateSettings}
+          />
+        </Suspense>
         {toastMsg && (
           <div className="toast-bar">
             <span>✨ {toastMsg}</span>
@@ -756,7 +801,7 @@ export default function App() {
             {nav.map(([id, label], i) => (
               <a
                 key={id}
-                href={id === "dashboard" ? "#dashboard" : "#" + id}
+                href={"#" + id}
                 className={(page === id ? "active " : "") + "nav-chip nav-chip-" + i}
                 style={{
                   color: navPaint[i]?.color || "#fff",
@@ -767,13 +812,8 @@ export default function App() {
                   padding: "8px 14px",
                   borderRadius: 999,
                 }}
-                onClick={(e) => {
-                  if (id === "dashboard") {
-                    e.preventDefault();
-                    handleOpenDashboardClick();
-                  } else {
-                    setPage(id);
-                  }
+                onClick={() => {
+                  setPage(id);
                 }}
               >
                 {label}
@@ -866,16 +906,11 @@ export default function App() {
                 return (
                   <a
                     key={id}
-                    href={id === "dashboard" ? "#dashboard" : "#" + id}
+                    href={"#" + id}
                     className={"mobile-nav-item" + (page === id ? " active" : "")}
-                    onClick={(e) => {
+                    onClick={() => {
                       setMobileMenuOpen(false);
-                      if (id === "dashboard") {
-                        e.preventDefault();
-                        handleOpenDashboardClick();
-                      } else {
-                        setPage(id);
-                      }
+                      setPage(id);
                     }}
                   >
                     <span className="mobile-nav-icon">{icon}</span>
@@ -1381,12 +1416,6 @@ export default function App() {
             <a href="#services">{t.nav.services}</a>
             <a href="#work">{t.nav.work}</a>
             <a href="#contact">{t.nav.contact}</a>
-            <button
-              onClick={handleOpenDashboardClick}
-              style={{ background: "transparent", border: 0, color: "var(--accent)", fontWeight: 700, cursor: "pointer" }}
-            >
-              ⚙️ {t.nav.dashboard}
-            </button>
           </div>
         </div>
       </footer>
