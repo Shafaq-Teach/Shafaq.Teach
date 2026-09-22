@@ -487,7 +487,7 @@ export default function App() {
         title: "ئاشخانا كۆپ تىللىق QR POS ۋە ئاشپەز ئېكرانى",
         client: "شەپەق لەغمەن سارىيى",
         category: "ئاشخانا POS",
-        budget: "¥8,500",
+        budget: "$1,200",
         stage: "dev",
         deadline: "2026-08-25",
         progress: 75,
@@ -497,7 +497,7 @@ export default function App() {
         title: "RTL ئېلېكترونلۇق تور دۇكىنى ۋە كۆچمە سېۋەت",
         client: "نەپىس بۇتېك دۇكىنى",
         category: "تور بەت",
-        budget: "¥6,800",
+        budget: "$950",
         stage: "design",
         deadline: "2026-08-28",
         progress: 40,
@@ -507,7 +507,7 @@ export default function App() {
         title: "كارخانا ئامبار ۋە Excel ئاپتوماتلاشتۇرۇش سىستېمىسى",
         client: "تەڭرىتاغ سودا گۇرۇپپىسى",
         category: "ئىشخانا يۇمشاق دېتالى",
-        budget: "¥12,000",
+        budget: "$1,800",
         stage: "shipped",
         deadline: "2026-08-15",
         progress: 100,
@@ -517,7 +517,7 @@ export default function App() {
         title: "شىركەت كۆرۈنمە كىملىك VI ۋە لوگو لايىھەسى",
         client: "ئالتۇن تاغ مەبلەغ سېلىش",
         category: "ماركا لايىھە",
-        budget: "¥4,500",
+        budget: "$650",
         stage: "new",
         deadline: "2026-09-02",
         progress: 10,
@@ -963,8 +963,7 @@ export default function App() {
 
       <main className="wrap">
         {/* HERO WITH INTEGRATED 3 HIGH-CONVERTING VALUE PROPOSITION CARDS */}
-        {(page === "home") && (
-          <section id="home" className="hero" style={{ backgroundImage: `url(${heroTech})` }}>
+        {(page === "home") && (\n          <section id="home" className="hero" style={{ backgroundImage: `url(${heroTech})` }}>
             <img className="hero-bg" src={heroTech} alt="" />
             <div className="hero-veil" />
             <div className="hero-inner">
@@ -1162,490 +1161,415 @@ export default function App() {
         {/* SERVICES */}
         {(page === "home" || page === "services") && (
           <section id="services" className="section">
-            <h2>{t.servicesTitle}</h2>
-            <div className="grid g3">
+            <div className="section-head">
+              <div className="kicker">{t.servicesKicker}</div>
+              <h2>{t.servicesTitle}</h2>
+            </div>
+            <div className="grid col-3">
               {t.services.map((s, i) => (
-                <article className={`card svc svc-${i}`} key={s.t}>
-                  <h3>{s.t}</h3>
-                  <p>{s.d}</p>
-                </article>
+                <div className="card service-card" key={i}>
+                  <div className="card-top">
+                    <span className="badge">{s.tag}</span>
+                  </div>
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                  <ul className="service-bullets">
+                    {s.bullets.map((b, bi) => (
+                      <li key={bi}>
+                        <span className="check-icon">✓</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* 🌟 PROMO STATIC CAROUSEL (2 CARDS ON PC, 1 CARD ON MOBILE, WITH ARROW BUTTONS & FULL IMAGES) */}
-        {page === "home" && (
-          <section className="promo-carousel-sec">
+        {/* 🚀 LIVE PROMO & SPECIAL OFFERS BANNER CAROUSEL */}
+        {promoAds && promoAds.length > 0 && (
+          <section className="section promo-carousel-sec">
             <div className="promo-carousel-container">
-              {/* Prev Navigation Button */}
-              <button
-                className="promo-nav-btn promo-prev-btn"
-                onClick={dir === "rtl" ? handleNextPromo : handlePrevPromo}
-                aria-label="Previous Slide"
-                title={lang === "ug" ? "ئالدىنقى" : lang === "ar" ? "السابق" : lang === "tr" ? "Önceki" : "Previous"}
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d={dir === "rtl" ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6"} />
-                </svg>
-              </button>
-
-              {/* Viewport */}
-              <div className="promo-carousel-viewport">
-                <div
-                  className="promo-carousel-track"
-                  style={{ "--promo-idx": promoIndex } as React.CSSProperties}
-                >
-                  {promoAds.map((ad, idx) => {
-                    const adImage = ad.image || defaultPromoAds[idx]?.image;
-                    const adText = t.ads[idx] || ad.text;
-                    return (
-                      <div className="promo-slide-item" key={ad.id || idx}>
-                        <article className="promo-banner-card">
-                          <img className="promo-banner-img" src={adImage} alt={adText} />
-                          <div className="promo-banner-overlay">
-                            <span className="promo-banner-text">{adText}</span>
-                          </div>
-                        </article>
-                      </div>
-                    );
-                  })}
+              <div className="promo-carousel-head">
+                <div className="promo-badge-tag">
+                  <span className="promo-pulse-dot" />
+                  <span>{lang === "ug" ? "ئالاھىدە پائالىيەت ۋە ئېتىبارلار" : lang === "ar" ? "العروض والخصومات الخاصة" : lang === "tr" ? "Özel Kampanyalar & İndirimler" : "Special Offers & Discounts"}</span>
+                </div>
+                <div className="promo-nav-buttons">
+                  <button
+                    className="promo-nav-btn"
+                    onClick={handlePrevPromo}
+                    aria-label="Previous Offer"
+                    title={dir === "rtl" ? "كېيىنكىسى" : "Previous"}
+                  >
+                    {dir === "rtl" ? "❯" : "❮"}
+                  </button>
+                  <button
+                    className="promo-nav-btn"
+                    onClick={handleNextPromo}
+                    aria-label="Next Offer"
+                    title={dir === "rtl" ? "ئالدىنقىسى" : "Next"}
+                  >
+                    {dir === "rtl" ? "❮" : "❯"}
+                  </button>
                 </div>
               </div>
 
-              {/* Next Navigation Button */}
-              <button
-                className="promo-nav-btn promo-next-btn"
-                onClick={dir === "rtl" ? handlePrevPromo : handleNextPromo}
-                aria-label="Next Slide"
-                title={lang === "ug" ? "كېيىنكى" : lang === "ar" ? "التالي" : lang === "tr" ? "Sonraki" : "Next"}
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d={dir === "rtl" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} />
-                </svg>
-              </button>
+              {/* Promo Cards Viewport */}
+              <div className="promo-cards-viewport">
+                <div
+                  className="promo-cards-track"
+                  style={{
+                    transform: isMobileScreen()
+                      ? (dir === "rtl" ? `translateX(${promoIndex * 100}%)` : `translateX(-${promoIndex * 100}%)`)
+                      : (dir === "rtl" ? `translateX(${promoIndex * 50}%)` : `translateX(-${promoIndex * 50}%)`),
+                    transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {promoAds.map((ad, idx) => (
+                    <div className="promo-card" key={ad.id || idx}>
+                      <div className="promo-card-img-wrap">
+                        <img
+                          src={ad.image || "media/pos-v4.jpg"}
+                          alt={ad.text}
+                          className="promo-card-img"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "media/pos-v4.jpg";
+                          }}
+                        />
+                        <div className="promo-card-overlay" />
+                        <span className="promo-card-pill">🔥 {lang === "ug" ? "قىزىق تەۋسىيە" : lang === "ar" ? "عرض حصري" : lang === "tr" ? "Fırsat" : "Hot Offer"}</span>
+                      </div>
+                      <div className="promo-card-body">
+                        <p className="promo-card-text">{ad.text}</p>
+                        <button
+                          className="promo-card-action-btn"
+                          onClick={() => {
+                            setContactMessage(`[پائالىيەت سۈرۈشتۈرۈش: ${ad.text}]\n\nمۇشۇ ئېتىبار پائالىيەت توغرىسىدا تەپسىلىي ئۇچۇر ئالماقچى:`);
+                            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                        >
+                          <span>{lang === "ug" ? "سۈرۈشتۈرۈش" : lang === "ar" ? "استفسار الآن" : lang === "tr" ? "Bilgi Al" : "Inquire Now"}</span>
+                          <span>{dir === "rtl" ? "←" : "→"}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dot Indicators */}
+              {promoAds.length > 1 && (
+                <div className="promo-dots">
+                  {promoAds.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      className={`promo-dot ${dotIdx === promoIndex ? "active" : ""}`}
+                      onClick={() => setPromoIndex(dotIdx)}
+                      aria-label={`Go to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* WORK / SHOWCASE SECTION */}
+        {(page === "home" || page === "work") && (
+          <section id="work" className="section">
+            <div className="section-head">
+              <div className="kicker">{t.workKicker}</div>
+              <h2>{t.workTitle}</h2>
             </div>
 
-            {/* Pagination Dots */}
-            <div className="promo-dots">
-              {promoAds.map((_, i) => (
-                <button
-                  key={i}
-                  className={"promo-dot" + (promoIndex === i ? " active" : "")}
-                  onClick={() => setPromoIndex(i)}
-                  aria-label={`Slide ${i + 1}`}
-                />
+            {/* Custom Interactive Tabs / Showcase Cards */}
+            <div className="grid col-2 work-grid-v2">
+              {showcaseProjects.map((item, idx) => (
+                <div
+                  className="card work-card-v2"
+                  key={item.id || idx}
+                  onClick={() => selectProjectForInquiry(idx % t.projectDetails.length)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="work-thumb-wrap">
+                    <img
+                      className="work-thumb"
+                      src={item.image || "media/pos-v4.jpg"}
+                      alt={item.title}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "media/pos-v4.jpg";
+                      }}
+                    />
+                    <div className="work-thumb-badge">
+                      <span className="badge" style={{ background: "rgba(10, 15, 29, 0.85)", color: "#38bdf8", border: "1px solid #0284c7" }}>
+                        {item.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="work-card-info">
+                    <div className="work-card-meta-row">
+                      <span
+                        className="work-brand-tag"
+                        style={{
+                          color: item.nameColor || WORK_NAME_COLORS[idx % WORK_NAME_COLORS.length],
+                          fontWeight: 700,
+                        }}
+                      >
+                        {item.name}
+                      </span>
+                      <span
+                        className="work-desc-tag"
+                        style={{
+                          color: item.descColor || WORK_DESC_COLORS[idx % WORK_DESC_COLORS.length],
+                          fontSize: 13,
+                        }}
+                      >
+                        {item.desc}
+                      </span>
+                    </div>
+                    <h3 className="work-title">{item.title}</h3>
+                    <div className="tags-cloud">
+                      {item.tags.map((tg, ti) => (
+                        <span className="tech-tag" key={ti}>
+                          {tg}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="work-inquiry-hint">
+                      <span>{lang === "ug" ? "سۈرۈشتۈرۈش ۋە زاكاز قىلىش" : lang === "ar" ? "طلب استفسار أو عرض سعر" : lang === "tr" ? "Fiyat ve Süreç İste" : "Inquire & Order Similar"}</span>
+                      <span className="arrow">{dir === "rtl" ? "←" : "→"}</span>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </section>
         )}
-
-        {/* WORK / CASE STUDIES (100% MULTILINGUAL IN ARABIC, UYGHUR, TURKISH, ENGLISH) */}
-        {(page === "home" || page === "work") && (
-          <section id="work" className="section">
-            <div className="section-head-row">
-              <div>
-                <h2>{t.workTitle}</h2>
-                <p className="work-hint-badge">{t.workHint}</p>
-              </div>
-            </div>
-            <div className="grid g2">
-              {showcaseProjects.map((p, i) => {
-                const img = p.image || defaultShowcaseProjects[i]?.image || "media/pos-v4.jpg";
-                const nameColor = p.nameColor || WORK_NAME_COLORS[i % WORK_NAME_COLORS.length];
-                const descColor = p.descColor || WORK_DESC_COLORS[i % WORK_DESC_COLORS.length];
-                const displayName = p.name || t.works[i]?.t || "تۈر";
-                const displayDesc = p.desc || t.works[i]?.d || p.title || "";
-                return (
-                  <article
-                    className="card work-card interactive-work-card"
-                    key={p.id || i}
-                    onClick={() => setActiveProject(i)}
-                  >
-                    <div className="work-photo-wrap">
-                      <img
-                        className="work-photo"
-                        src={img}
-                        alt=""
-                        style={i === 1 ? { objectPosition: "top center" } : undefined}
-                      />
-                      <div className="work-inspect-overlay">
-                        <span className="inspect-chip">
-                          🔍 {lang === "ar" ? "عرض التفاصيل" : lang === "tr" ? "Detayları İncele" : lang === "en" ? "Inspect Details" : "تەپسىلات كۆرۈش"}
-                        </span>
-                      </div>
-                    </div>
-                    <p style={{ margin: "8px 0 0", lineHeight: 1.9, fontSize: 17 }}>
-                      <b
-                        className="work-name"
-                        style={{ color: nameColor, background: "#ecfdf5" }}
-                      >
-                        {displayName}
-                      </b>
-                      {" — "}
-                      <span style={{ color: descColor }}>{displayDesc}</span>
-                    </p>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-
 
         {/* PROCESS */}
         {(page === "home" || page === "process") && (
           <section id="process" className="section">
-            <h2>{t.processTitle}</h2>
-            <div className="steps">
-              {t.steps.map((s, i) => (
-                <div className={`step step-${i}`} key={s} style={{ backgroundImage: `url(${stepImgs[i]})` }}>
-                  <b>0{i + 1}</b>
-                  <span>{s}</span>
+            <div className="section-head">
+              <div className="kicker">{t.processKicker}</div>
+              <h2>{t.processTitle}</h2>
+            </div>
+            <div className="process-grid">
+              {t.steps.map((st, i) => (
+                <div className="process-card" key={i}>
+                  <div className="process-img-wrap">
+                    <img className="process-img" src={stepImgs[i]} alt={st.title} />
+                    <span className="step-badge">{st.num}</span>
+                  </div>
+                  <div className="process-text">
+                    <h3>{st.title}</h3>
+                    <p>{st.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-
-
-
-
-        {/* DIRECT QUICK CONTACT BUTTONS BAR */}
-        <section className="section direct-contact-sec">
-          <div className="card direct-card">
-            <div className="section-head">
-              <h2>{t.directContactTitle}</h2>
-              <p className="subhead">{t.directContactSubtitle}</p>
-            </div>
-            <div className="direct-buttons-row">
-              <a
-                href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="direct-btn wa-btn"
-              >
-                <img src="media/icon-whatsapp.png" alt="WhatsApp" className="contact-icon-img" />
-                <span>{t.whatsappBtn}</span>
-              </a>
-              <a
-                href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
-                target="_blank"
-                rel="noreferrer"
-                className="direct-btn tg-btn"
-              >
-                <img src="media/icon-telegram.png" alt="Telegram" className="contact-icon-img" />
-                <span>{t.telegramBtn}</span>
-              </a>
-              <a
-                href={`tel:${rawWhatsapp || "8613000000000"}`}
-                className="direct-btn phone-btn"
-              >
-                <img src="media/icon-phone.png" alt="Phone" className="contact-icon-img" />
-                <span>{t.phoneCallBtn || "تېلېفون قىلىش"}</span>
-              </a>
-              <button
-                type="button"
-                className="direct-btn mail-btn"
-                onClick={copyEmail}
-              >
-                <span className="btn-icon">📋</span>
-                <span>{t.copyEmailBtn}</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* CONTACT FORM */}
-        {(page === "home" || page === "contact") && (
-          <section id="contact" className="section">
+        {/* CONTACT */}
+        <section id="contact" className="section contact-sec">
+          <div className="section-head">
+            <div className="kicker">{t.contactKicker}</div>
             <h2>{t.contactTitle}</h2>
+          </div>
+
+          <div className="contact-wrap">
+            {/* Direct Contact Buttons */}
+            <div className="contact-methods">
+              <a
+                href={`https://wa.me/${rawWhatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-card wa-card"
+              >
+                <div className="contact-icon">💬</div>
+                <div className="contact-details">
+                  <h4>WhatsApp</h4>
+                  <p>{settings.whatsapp || "+86 130 0000 0000"}</p>
+                  <span className="contact-badge">{lang === "ug" ? "دەرھال جاۋاب" : lang === "ar" ? "رد فوري" : lang === "tr" ? "Hızlı Yanıt" : "Instant Reply"}</span>
+                </div>
+              </a>
+
+              <a
+                href={`https://t.me/${rawTelegram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-card tg-card"
+              >
+                <div className="contact-icon">✈️</div>
+                <div className="contact-details">
+                  <h4>Telegram</h4>
+                  <p>{settings.telegram || "@shafaq_tech"}</p>
+                  <span className="contact-badge">{lang === "ug" ? "دەل ۋاقتىدا" : lang === "ar" ? "متصل دائماً" : lang === "tr" ? "Çevrimiçi" : "Always Online"}</span>
+                </div>
+              </a>
+
+              <div className="contact-card email-card" onClick={copyEmail} style={{ cursor: "pointer" }}>
+                <div className="contact-icon">✉️</div>
+                <div className="contact-details">
+                  <h4>Email</h4>
+                  <p>{settings.email || "contact@shafaqtech.com"}</p>
+                  <span className="contact-badge">{lang === "ug" ? "كۆچۈرۈۋېلىش" : lang === "ar" ? "نسخ البريد" : lang === "tr" ? "Kopyala" : "Click to Copy"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Contact / Request Form */}
             <form
-              className="form card"
+              className="contact-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                // Automatically register into Leads CRM state and localStorage
+                if (!contactName.trim()) {
+                  showToast(lang === "ug" ? "ئىسمىڭىزنى يېزىڭ" : "Please enter name");
+                  return;
+                }
+
+                // Add to leads automatically
                 const newLead: LeadItem = {
-                  id: "L" + Date.now().toString().slice(-3),
-                  name: contactName || "خېرىدار",
+                  id: "L" + Date.now().toString().slice(-4),
+                  name: contactName,
                   contact: contactEmail,
-                  service: "تور بېكەت ۋە تېخنىكا",
-                  estDays: "5-8 كۈن",
+                  service: "تور بېكەت / يۇمشاق دېتال تەلەپ",
+                  estDays: "3-5 كۈن",
                   date: new Date().toISOString().slice(0, 10),
                   status: "new",
-                  note: contactMessage || "يېڭى ئالاقە جەدۋىلى ئۇچۇرى",
+                  note: contactMessage,
                 };
                 updateLeads([newLead, ...leads]);
 
-                alert(
-                  lang === "tr"
-                    ? "Mesajınız başarıyla iletildi ve CRM sistemine kaydedildi!"
-                    : lang === "en"
-                    ? "Message sent successfully and logged into CRM!"
-                    : lang === "ar"
-                    ? "تم إرسال رسالتكم بنجاح وتسجيلها في النظام!"
-                    : "ئۇچۇرىڭىز تاپشۇرۇۋېلىندى ۋە سىستېمىغا رەسمىي كىرگۈزۈلدى!"
-                );
+                showToast(lang === "ug" ? "✅ ئۇچۇرىڭىز تاپشۇرۇلدى! سىز بىلەن ئالاقىلىشىمىز." : "✅ Message sent! We will contact you soon.");
                 setContactName("");
                 setContactEmail("");
                 setContactMessage("");
               }}
             >
-              <input
-                required
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                placeholder={t.name}
-              />
-              <input
-                type="email"
-                required
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="email@domain.com"
-                dir="ltr"
-              />
-              <textarea
-                required
-                rows={5}
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                placeholder={t.msg}
-              />
-              <button className="btn" type="submit">
-                {t.send}
+              <h3 style={{ margin: "0 0 16px 0", fontSize: 18, color: "var(--text-color)" }}>
+                {lang === "ug" ? "تۈر سۈرۈشتۈرۈش ياكى باھا تەلەپ قىلىش" : lang === "ar" ? "طلب استشارة أو عرض أسعار" : lang === "tr" ? "Proje veya Teklif Talebi" : "Project Inquiry / Request Quote"}
+              </h3>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder={lang === "ug" ? "ئىسمىڭىز (مەسىلەن: ئەلى)" : lang === "ar" ? "اسمك الكريم" : lang === "tr" ? "Adınız" : "Your Name"}
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder={lang === "ug" ? "تېلېفون ياكى WhatsApp / Telegram ئادرېسىڭىز" : lang === "ar" ? "رقم الهاتف أو WhatsApp" : lang === "tr" ? "Telefon veya İletişim Bilgisi" : "Phone / WhatsApp / Contact Info"}
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <textarea
+                  rows={4}
+                  placeholder={lang === "ug" ? "تۈر ھەققىدە قىسقىچە تەلەپلىرىڭىزنى يېزىڭ..." : lang === "ar" ? "اكتب تفاصيل طلبك هنا..." : lang === "tr" ? "Projeniz hakkında kısa bilgi verin..." : "Tell us briefly about your project..."}
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn submit-btn">
+                {lang === "ug" ? "يوللاش 🚀" : lang === "ar" ? "إرسال 🚀" : lang === "tr" ? "Gönder 🚀" : "Submit Request 🚀"}
               </button>
             </form>
-          </section>
-        )}
+          </div>
+        </section>
       </main>
 
       {/* FOOTER */}
-      <footer>
-        <div className="wrap footer-wrap">
-          <div>{settings.brandName ? `© 2026 ${settings.brandName}` : t.footer}</div>
-          <div className="footer-links">
-            <a href="#home">{t.nav.home}</a>
-            <a href="#services">{t.nav.services}</a>
-            <a href="#work">{t.nav.work}</a>
-            <a href="#contact">{t.nav.contact}</a>
+      <footer className="footer">
+        <div className="wrap footer-inner">
+          <div className="footer-brand">
+            <img className="logo" src={logo} alt={displayBrand} width={38} height={38} />
+            <span className="brand-name">{displayBrand}</span>
+          </div>
+          <div className="footer-copy">
+            © {new Date().getFullYear()} {displayBrand}. All rights reserved.
           </div>
         </div>
       </footer>
 
-      {/* ADMIN AUTH / LOGIN MODAL */}
+      {/* ADMIN AUTH MODAL */}
       <AdminAuthModal
-        lang={lang}
         isOpen={authModalOpen}
         onClose={handleAuthClose}
         onSuccess={handleAuthSuccess}
-        onShowToast={showToast}
+        lang={lang}
         credentials={credentials}
         onUpdateCredentials={updateCredentials}
       />
 
-      {/* PROJECT DETAIL MODAL / LIGHTBOX (100% DYNAMIC AND MULTILINGUAL) */}
-      {activeProject !== null && (
-        <div className="modal-backdrop" onClick={() => setActiveProject(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
-              ✕
-            </button>
-            <div className="modal-image-wrap">
-              <img
-                src={showcaseProjects[activeProject]?.image || defaultShowcaseProjects[activeProject]?.image}
-                alt=""
-                className="modal-image"
-                style={activeProject === 1 ? { objectPosition: "top center" } : undefined}
-              />
-              <span className="modal-cat-badge">
-                {t.projectDetails[activeProject]?.category}
-              </span>
-            </div>
-            <div className="modal-content">
-              <h2 className="modal-title">{t.projectDetails[activeProject]?.title}</h2>
-              <p className="modal-tagline">{t.projectDetails[activeProject]?.tagline}</p>
+      {/* AI ASSISTANT FLOATING BUTTON & MODAL */}
+      <AiAssistantModal
+        lang={lang}
+        onSelectInquiry={(inqText) => {
+          setContactMessage(inqText);
+          document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
 
-              {/* Tags */}
-              <div className="modal-tags">
-                {t.projectDetails[activeProject]?.tags.map((tag, idx) => (
-                  <span className="modal-tag" key={idx}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Features */}
-              <div className="modal-section-title">
-                {lang === "ar"
-                  ? "أبرز الميزات والحلول المنفذة:"
-                  : lang === "tr"
-                  ? "Sağlanan Temel Özellikler:"
-                  : lang === "en"
-                  ? "Key Capabilities Delivered:"
-                  : "ئاساسلىق ئىقتىدار ۋە ھەل قىلىش چارىلىرى:"}
-              </div>
-              <ul className="modal-features-list">
-                {t.projectDetails[activeProject]?.features.map((feat, fidx) => (
-                  <li key={fidx}>
-                    <span className="feat-check">✓</span>
-                    <span>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Deliverables */}
-              <div className="modal-deliverables">
-                <strong>
-                  {lang === "ar"
-                    ? "المخرجات: "
-                    : lang === "tr"
-                    ? "Teslim Edilenler: "
-                    : lang === "en"
-                    ? "Deliverables: "
-                    : "تاپشۇرۇلىدىغان مەھسۇلات: "}
-                </strong>
-                <span>{t.projectDetails[activeProject]?.deliverables}</span>
-              </div>
-
-              {/* Actions */}
-              <div className="modal-actions">
-                <button
-                  className="btn"
-                  onClick={() => selectProjectForInquiry(activeProject)}
-                >
-                  {lang === "ar"
-                    ? "طلب مشروع مماثل"
-                    : lang === "tr"
-                    ? "Benzer Proje İçin Teklif Al"
-                    : lang === "en"
-                    ? "Inquire Similar Project"
-                    : "مۇشۇنداق تۈر سۈرۈشتۈرۈش"}
-                </button>
-                <button
-                  className="btn ghost"
-                  onClick={() => setActiveProject(null)}
-                >
-                  {lang === "ar" ? "إغلاق" : lang === "tr" ? "Kapat" : lang === "en" ? "Close" : "تاقاش"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* WECHAT MODAL */}
-      {wechatModal && (
-        <div className="modal-backdrop" onClick={() => setWechatModal(false)}>
-          <div className="modal-card small-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={() => setWechatModal(false)}>
-              ✕
-            </button>
-            <div className="small-modal-content">
-              <h3>WeChat ID</h3>
-              <div className="wechat-box">
-                <code>{settings.wechat || "ShafaqTechHub"}</code>
-                <button
-                  className="btn"
-                  onClick={() => {
-                    navigator.clipboard.writeText(settings.wechat || "ShafaqTechHub");
-                    showToast(t.copiedToast);
-                    setWechatModal(false);
-                  }}
-                >
-                  {lang === "tr" ? "ID Kopyala" : lang === "en" ? "Copy ID" : lang === "ar" ? "نسخ المعرّف" : "ID كۆچۈرۈش"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TOAST NOTIFICATION */}
+      {/* TOAST MESSAGE */}
       {toastMsg && (
         <div className="toast-bar">
           <span>✨ {toastMsg}</span>
         </div>
       )}
-
-      {/* 🤖 FLOATING AI ASSISTANT & KNOWLEDGE BASE CHAT */}
-      <AiAssistantModal
-        lang={lang}
-        whatsappNumber={settings.whatsapp}
-        onOpenEstimator={() => {
-          setPage("home");
-          setTimeout(() => {
-            document.querySelector(".estimator-sec")?.scrollIntoView({ behavior: "smooth" });
-          }, 80);
-        }}
-        onOpenContact={() => {
-          setPage("home");
-          setTimeout(() => {
-            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-          }, 80);
-        }}
-        onOpenWork={() => {
-          setPage("home");
-          setTimeout(() => {
-            document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
-          }, 80);
-        }}
-      />
-
-      {/* FLOATING QUICK CONTACT BAR */}
-      <aside className="floating-contact">
-        <a
-          href={`tel:${rawWhatsapp || "8613000000000"}`}
-          className="float-btn float-phone"
-          title={t.phoneCallBtn || "Telephone"}
-        >
-          <img src="media/icon-phone.png" alt="Phone" className="float-icon-img" />
-        </a>
-        <a
-          href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
-          target="_blank"
-          rel="noreferrer"
-          className="float-btn float-wa"
-          title="WhatsApp"
-        >
-          <img src="media/icon-whatsapp.png" alt="WhatsApp" className="float-icon-img" />
-        </a>
-        <a
-          href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
-          target="_blank"
-          rel="noreferrer"
-          className="float-btn float-tg"
-          title="Telegram"
-        >
-          <img src="media/icon-telegram.png" alt="Telegram" className="float-icon-img" />
-        </a>
-      </aside>
     </div>
   );
 }
 
-function ThemeIcon({ theme: _theme }: { theme?: Theme } = {}) {
+function ThemeIcon({ theme }: { theme: Theme }) {
+  if (theme === "ember") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+      </svg>
+    );
+  }
+  if (theme === "caspian") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3a9 9 0 0 0-9 9 9 9 0 0 0 9 9 9 9 0 0 0 9-9 9 9 0 0 0-9-9zm0 16a7 7 0 0 1-7-7 7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7z" />
+      </svg>
+    );
+  }
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-      <path d="M12 4a8 8 0 0 0 0 16V4z" fill="currentColor" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z" />
     </svg>
   );
 }
+
 function SunIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
     </svg>
   );
 }
+
 function MoonIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M16.5 13.5A7 7 0 0 1 10 4a7 7 0 1 0 6.5 9.5z" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   );
 }
