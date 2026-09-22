@@ -352,7 +352,7 @@ export default function Dashboard({
     setNewProjDesc("");
     setNewProjTags("");
     setNewProjImage("media/pos-v4.jpg");
-    onShowToast(lang === "tr" ? "Yeni proje eklendi ve sitede yayınlandı! " : "يېڭى ئەسەر قوشۇلدى ۋە ئالدى بەتكە يېڭىلاندى! 🎨✨");
+    onShowToast(lang === "tr" ? "Yeni proje eklendi ve sitede yayınlandı!" : "يېڭى ئەسەر قوشۇلدى ۋە ئالدى بەتكە يېڭىلاندى! 🎨✨");
   };
 
   const handleDeleteShowcaseProject = (id: string) => {
@@ -934,7 +934,7 @@ export default function Dashboard({
                           <h4 className="kanban-card-title">{p.title}</h4>
                           <div className="kanban-client">{lang === "tr" ? "Müşteri: " : lang === "en" ? "Client: " : "خېرىدار: "}{p.client}</div>
                           <div className="kanban-budget" style={{ marginTop: 8 }}>
-                            {lang === "tr" ? "Bütçe: " : lang === "en" ? "Budget: " : "خامچوت: "}{p.budget}
+                            {lang === "tr" ? "Bütçe: " : lang === "en" ? "Budget: " : "ھەققى: "}{p.budget}
                           </div>
                         </div>
                       ))}
@@ -944,7 +944,7 @@ export default function Dashboard({
             </div>
           )}
 
-          {/* TAB 3: LEADS & CRM */}
+          {/* TAB 3: LEADS & INQUIRIES CRM */}
           {activeTab === "leads" && (
             <div className="dash-tab-pane">
               <div className="section-head-row">
@@ -952,421 +952,583 @@ export default function Dashboard({
                   <h2>✉️ {t.dash.navLeads}</h2>
                   <p className="subhead">
                     {lang === "tr"
-                      ? "Web sitesinden gelen doğrudan müşteri talepleri ve iletişim kayıtları"
+                      ? "Web sitesindeki akıllı hesaplayıcı ve iletişim formundan gelen gerçek zamanlı talepler"
                       : lang === "en"
-                      ? "Incoming client inquiries, requests and contact notes"
-                      : "تور بېكەت ئالدى قىسمىدىن تاپشۇرۇلغان خېرىدارلار زاكاز تىزىملىكى ۋە خاتىرىلىرى"}
+                      ? "Realtime inquiries from website estimator and contact form"
+                      : "ئالدى بەتتىكى ئەقلىي مۆلچەرلىگۈچ ۋە ئالاقە جەدۋىلىدىن چۈشكەن دەل ۋاقتىدىكى زاكازلار"}
                   </p>
                 </div>
-                <div className="badge positive">{leads.length} {lang === "tr" ? "Kayıt" : lang === "en" ? "Records" : "تال خاتىرە"}</div>
               </div>
 
-              <div className="card leads-table-card">
-                <div className="table-responsive">
-                  <table className="leads-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>{lang === "tr" ? "Müşteri Adı" : lang === "en" ? "Client" : "خېرىدار ئىسمى"}</th>
-                        <th>{lang === "tr" ? "İletişim" : lang === "en" ? "Contact" : "ئالاقە نومۇرى"}</th>
-                        <th>{lang === "tr" ? "Talep Edilen Hizmet" : lang === "en" ? "Requested Service" : "تەلەپ قىلىنغان تۈر"}</th>
-                        <th>{lang === "tr" ? "Tahmini Süre" : lang === "en" ? "Est. Time" : "مۆلچەر ۋاقىت"}</th>
-                        <th>{lang === "tr" ? "Tarih" : lang === "en" ? "Date" : "چېسلا"}</th>
-                        <th>{lang === "tr" ? "Durum" : lang === "en" ? "Status" : "ھالىتى"}</th>
-                        <th>{lang === "tr" ? "İşlem" : lang === "en" ? "Action" : "مەشغۇلات"}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leads.map((l) => (
-                        <tr key={l.id}>
-                          <td><code>{l.id}</code></td>
-                          <td><strong>{l.name}</strong></td>
-                          <td>
-                            <a href={`tel:${l.contact.replace(/\s+/g, "")}`} className="contact-link">
-                              {l.contact}
+              <div className="card table-card">
+                <table className="dash-table">
+                  <thead>
+                    <tr>
+                      <th>{lang === "tr" ? "No" : lang === "en" ? "ID" : "نۇمۇرى"}</th>
+                      <th>{lang === "tr" ? "Müşteri" : lang === "en" ? "Client" : "خېرىدار"}</th>
+                      <th>{lang === "tr" ? "İletişim" : lang === "en" ? "Contact" : "ئالاقە"}</th>
+                      <th>{lang === "tr" ? "Hizmet" : lang === "en" ? "Service" : "مۇلازىمەت"}</th>
+                      <th>{lang === "tr" ? "Süre" : lang === "en" ? "Timeline" : "پۈتۈش"}</th>
+                      <th>{lang === "tr" ? "Not / Talep" : lang === "en" ? "Requirement" : "تەلەپ مەزمۇنى"}</th>
+                      <th>{lang === "tr" ? "Tarih" : lang === "en" ? "Date" : "ۋاقتى"}</th>
+                      <th>{lang === "tr" ? "Durum" : lang === "en" ? "Status" : "ھالىتى"}</th>
+                      <th>{lang === "tr" ? "İşlem" : lang === "en" ? "Action" : "مەشغۇلات"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map((lead) => (
+                      <tr key={lead.id}>
+                        <td><code>#{lead.id}</code></td>
+                        <td><strong>{lead.name}</strong></td>
+                        <td><small>{lead.contact}</small></td>
+                        <td><span className="table-badge">{lead.service}</span></td>
+                        <td>{lead.estDays}</td>
+                        <td className="lead-note-cell">{lead.note}</td>
+                        <td>{lead.date}</td>
+                        <td>
+                          <span className={"status-pill " + lead.status}>
+                            {lead.status === "new"
+                              ? lang === "tr" ? "Yeni" : lang === "en" ? "New" : "يېڭى"
+                              : lead.status === "contacted"
+                              ? lang === "tr" ? "Görüşüldü" : lang === "en" ? "Contacted" : "ئالاقىلىشىلدى"
+                              : lang === "tr" ? "Onaylandı" : lang === "en" ? "Approved" : "كېلىشىلدى"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="table-actions">
+                            <a
+                              href={`https://wa.me/${formWhatsapp.replace(/[^0-9]/g, "") || "8613000000000"}?text=Hello%20${encodeURIComponent(lead.name)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="dash-action-btn wa-act"
+                              title="WhatsApp"
+                            >
+                              <img src="media/icon-whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18, verticalAlign: "middle" }} />
                             </a>
-                          </td>
-                          <td>{l.service}</td>
-                          <td>{l.estDays}</td>
-                          <td>{l.date}</td>
-                          <td>
-                            <span className={"status-pill " + l.status}>
-                              {l.status === "new"
-                                ? lang === "tr" ? "Yeni" : lang === "en" ? "New" : "يېڭى تەلەپ"
-                                : l.status === "contacted"
-                                ? lang === "tr" ? "Görüşüldü" : lang === "en" ? "Contacted" : "ئالاقىلىشىلدى"
-                                : lang === "tr" ? "Onaylandı" : lang === "en" ? "Approved" : "ماقۇللاندى"}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="table-actions">
-                              {l.status === "new" && (
-                                <button
-                                  className="btn-tiny"
-                                  onClick={() => {
-                                    const updated = leads.map((item) =>
-                                      item.id === l.id ? { ...item, status: "contacted" as const } : item
-                                    );
-                                    onUpdateLeads(updated);
-                                    onShowToast(lang === "tr" ? "Durum güncellendi!" : "ھالەت يېڭىلاندى!");
-                                  }}
-                                >
-                                  {lang === "tr" ? "Görüşüldü Yap" : "ئالاقىلەشتىم"}
-                                </button>
-                              )}
-                              {l.status === "contacted" && (
-                                <button
-                                  className="btn-tiny success"
-                                  onClick={() => {
-                                    const updated = leads.map((item) =>
-                                      item.id === l.id ? { ...item, status: "approved" as const } : item
-                                    );
-                                    onUpdateLeads(updated);
-                                    onShowToast(lang === "tr" ? "Müşteri onaylandı!" : "زاكاز ماقۇللاندى!");
-                                  }}
-                                >
-                                  {lang === "tr" ? "Onayla" : "ماقۇللاش"}
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            <button
+                              className="dash-action-btn"
+                              title="Durumu güncelle"
+                              onClick={() => {
+                                const updated = leads.map((x) =>
+                                  x.id === lead.id
+                                    ? { ...x, status: x.status === "new" ? ("contacted" as const) : ("approved" as const) }
+                                    : x
+                                );
+                                onUpdateLeads(updated);
+                                onShowToast(lang === "tr" ? "Durum güncellendi!" : "ھالىتى يېڭىلاندى!");
+                              }}
+                            >
+                              ✓
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
 
-          {/* TAB 4: CMS & CONTENT MANAGEMENT */}
+          {/* TAB 4: PORTFOLIO CMS — PROMO ADS & SHOWCASE PROJECTS WITH IMAGE UPLOAD */}
           {activeTab === "cms" && (
             <div className="dash-tab-pane">
               <div className="section-head-row">
                 <div>
-                  <h2>🖼️ {t.dash.navCms}</h2>
+                  <h2>🎨 {t.dash.navCms}</h2>
                   <p className="subhead">
                     {lang === "tr"
-                      ? "Ana sayfadaki kayan duyuruları, reklamları ve vitrin projelerini canlı düzenleyin"
-                      : lang === "en"
-                      ? "Manage ticker ads, showcase gallery and banners live on your website"
-                      : "تور بەتتىكى ئېلانلار، تاللانما ئەسەرلەر ۋە رەسىملەرنى قولايلىق ئۆزگەرتىپ ئالدى بەتكە شۇ ھامان يېڭىلاڭ"}
+                      ? "Öne çıkan projeleri ve kayan yazı reklamlarını görsel yükleyerek anında güncelleyin"
+                      : "تاللانما ئەسەرلەر ۋە سىيرىلما ئېلانلارنى رەسىم يۈكلەپ شۇ ھامان ئالدى بەتكە يېڭىلاڭ"}
                   </p>
                 </div>
               </div>
 
-              {/* 1. Ticker & Promo Ads Manager */}
-              <div className="card cms-sec-card">
-                <div className="section-head-row">
-                  <div>
-                    <h3>📢 {lang === "tr" ? "Kayan Yazı ve Canlı Kampanyalar" : lang === "en" ? "Ticker & Promo Banner Ads" : "ئۈستۈنكى ئېلانلار ۋە سىيرىلما تەشۋىقاتلار"}</h3>
-                    <p className="subhead" style={{ margin: 0 }}>
-                      {lang === "tr" ? "Sitede dönen kampanya duyurularını ve görsellerini düzenleyin" : "باش بەتنىڭ ئەڭ ئۈستىدىكى ئېلان تېكىستلىرى ۋە رەسىملىرىنى تۈزىتىڭ"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button className="btn ghost" onClick={() => setShowAddAdModal(true)}>
-                      + {lang === "tr" ? "Yeni Reklam Ekle" : lang === "en" ? "Add Promo Ad" : "يېڭى ئېلان قوشۇش"}
-                    </button>
-                    <button className="btn" onClick={savePromoAds}>
-                      💾 {lang === "tr" ? "Reklamları Kaydet" : lang === "en" ? "Save Ads" : "ئېلانلارنى ساقلاش"}
+              <div className="dash-cms-grid">
+                {/* 1. EDITABLE SHOWCASE PROJECTS */}
+                <div className="card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+                    <h3 style={{ margin: 0 }}>🖼️ {lang === "tr" ? "Öne Çıkan Projeler" : "تاللانما ئەسەرلەر تىزىملىكى"}</h3>
+                    <button
+                      className="btn"
+                      style={{ padding: "6px 14px", fontSize: 13 }}
+                      onClick={() => setShowAddProjectModal((v) => !v)}
+                    >
+                      {showAddProjectModal ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "➕ Yeni Proje Ekle" : "➕ يېڭى ئەسەر قوشۇش")}
                     </button>
                   </div>
-                </div>
 
-                <div className="cms-ads-grid">
-                  {editablePromoAds.map((ad, i) => (
-                    <div className="cms-ad-item card" key={ad.id || i}>
-                      <div className="cms-ad-thumb-wrap">
-                        <img
-                          src={ad.image || "media/pos-v4.jpg"}
-                          alt=""
-                          className="cms-ad-thumb"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "media/pos-v4.jpg";
-                          }}
-                        />
-                        <label className="cms-upload-overlay" title="رەسىم ئالماشتۇرۇش">
-                          <span>📷 {lang === "tr" ? "Değiştir" : "رەسىم ئالماشتۇرۇش"}</span>
+                  {/* Add New Showcase Project Form Modal / Drawer */}
+                  {showAddProjectModal && (
+                    <div className="card" style={{ background: "rgba(6, 12, 44, 0.95)", border: "1.5px solid var(--accent)", padding: 18, marginBottom: 16 }}>
+                      <h4 style={{ margin: "0 0 12px", color: "var(--accent)" }}>
+                        ✨ {lang === "tr" ? "Yeni Öne Çıkan Proje Ekle" : "يېڭى تاللانما ئەسەر ۋە تەپسىلاتىنى قوشۇش"}
+                      </h4>
+                      <form onSubmit={handleCreateShowcaseProject} className="form">
+                        <div className="grid g2">
+                          <div>
+                            <label className="est-label">{lang === "tr" ? "Kısa İsim (Örn: Restoran, E-Ticaret):" : "قىسقا ئىسمى (مەسىلەن: رىستۇران، سودا، ئەپ):"}</label>
+                            <input
+                              value={newProjName}
+                              onChange={(e) => setNewProjName(e.target.value)}
+                              placeholder={lang === "tr" ? "Örn: Restoran" : "مەسىلەن: ئاشخانا"}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="est-label">{lang === "tr" ? "Kategori:" : "كەسپىي تۈرى:"}</label>
+                            <input
+                              value={newProjCategory}
+                              onChange={(e) => setNewProjCategory(e.target.value)}
+                              placeholder={lang === "tr" ? "Örn: Web & Mobil Uygulama" : "مەسىلەن: ئاشخانا ۋە مېھمانساراي تېخنىكىسى"}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Tam Proje Başlığı:" : "تولۇق ئەسەر نامى / تېمىسى:"}</label>
                           <input
-                            type="file"
-                            accept="image/*"
-                            style={{ display: "none" }}
-                            onChange={(e) => handleAdImageUpload(i, e)}
+                            value={newProjTitleCms}
+                            onChange={(e) => setNewProjTitleCms(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Çok Dilli Akıllı Restoran ve QR Menü" : "مەسىلەن: كۆپ تىللىق ئەقلىي ئاشخانا ۋە QR زاكاز سىستېمىسى"}
+                            required
                           />
-                        </label>
-                      </div>
-                      <div className="cms-ad-body">
-                        <div className="cms-ad-meta-top">
-                          <span className="badge">#0{i + 1}</span>
-                          <button
-                            className="btn-tiny danger"
-                            onClick={() => handleDeletePromoAd(ad.id || "")}
-                            title="ئۆچۈرۈش"
-                          >
-                            ✕
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Açıklama / Detay:" : "قىسقىچە چۈشەندۈرۈشى ۋە تەپسىلاتى:"}</label>
+                          <input
+                            value={newProjDesc}
+                            onChange={(e) => setNewProjDesc(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Çok dilli sipariş ve mutfak ekranı" : "مەسىلەن: كۆپ تىللىق زاكاز ۋە ئاشپەز ئېكرانى"}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Etiketler (Virgülle ayırın):" : "تېخنىكا بەلگىلىرى (ئۈتۈر بىلەن ئايرىڭ):"}</label>
+                          <input
+                            value={newProjTags}
+                            onChange={(e) => setNewProjTags(e.target.value)}
+                            placeholder="React, TypeScript, QR Menu, Cloud"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Görsel Seç / Yükle:" : "ئەسەر رەسىمى يۈكلەش:"}</label>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            {newProjImage && (
+                              <img src={newProjImage} alt="" style={{ width: 80, height: 55, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleNewProjectImageUpload}
+                              className="dash-file-input"
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                          <button type="submit" className="btn">
+                            💾 {lang === "tr" ? "Projeyi Ekle ve Yayınla" : "بۇ ئەسەرنى قوشۇش ۋە ئالدى بەتكە يېڭىلاش"}
+                          </button>
+                          <button type="button" className="btn ghost" onClick={() => setShowAddProjectModal(false)}>
+                            ✕ {lang === "tr" ? "İptal" : "ئەمەلدىن قالدۇرۇش"}
                           </button>
                         </div>
-                        <textarea
-                          className="cms-ad-textarea"
-                          rows={3}
-                          value={ad.text}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setEditablePromoAds((prev) =>
-                              prev.map((item, idx) => (idx === i ? { ...item, text: val } : item))
-                            );
-                          }}
-                        />
-                      </div>
+                      </form>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
 
-              {/* 2. Showcase Projects Manager */}
-              <div className="card cms-sec-card" style={{ marginTop: "24px" }}>
-                <div className="section-head-row">
-                  <div>
-                    <h3>🎨 {lang === "tr" ? "Öne Çıkan Vitrin Projeleri" : lang === "en" ? "Showcase Projects & Case Studies" : "باش بەتتىكى ئەسەرلەر كۆرگەزمىسى (Showcase)"}</h3>
-                    <p className="subhead" style={{ margin: 0 }}>
-                      {lang === "tr" ? "Müşterilerin inceleyip sipariş verebileceği projeleri ve fotoğraflarını yönetin" : "خېرىدارلار تاللاپ سۈرۈشتۈرىدىغان ئەسەرلەرنىڭ تېمىسى، تۈرى ۋە رەسىملىرىنى باشقۇرۇڭ"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button className="btn ghost" onClick={() => setShowAddProjectModal(true)}>
-                      + {lang === "tr" ? "Yeni Eser Ekle" : lang === "en" ? "Add Showcase Item" : "يېڭى ئەسەر قوشۇش"}
-                    </button>
-                    <button className="btn" onClick={saveShowcaseProjects}>
-                      💾 {lang === "tr" ? "Projeleri Kaydet" : lang === "en" ? "Save Projects" : "ئەسەرلەرنى ساقلاش"}
-                    </button>
-                  </div>
-                </div>
+                  <div className="cms-items-list">
+                    {editableProjects.map((item, idx) => (
+                      <div className="cms-work-item-card" key={item.id}>
+                        <div className="cms-work-item-head">
+                          <img src={item.image} alt="" className="cms-thumb-large" />
+                          <div className="cms-work-info">
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <strong className="work-name" style={{ fontSize: 16 }}>{item.name}</strong>
+                              <span className="table-badge">{item.category}</span>
+                            </div>
+                            <div className="cms-work-title">{item.title}</div>
+                            <div style={{ fontSize: 12, color: "var(--muted)" }}>{item.desc}</div>
+                          </div>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "6px 12px", fontSize: 13 }}
+                              onClick={() => setEditingProjectIndex(editingProjectIndex === idx ? null : idx)}
+                            >
+                              {editingProjectIndex === idx ? (lang === "tr" ? "Kapat" : "تاقاش") : (lang === "tr" ? "Düzenle ✏️" : "تەھرىرلەش ✏️")}
+                            </button>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "6px 10px", fontSize: 13, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
+                              onClick={() => handleDeleteShowcaseProject(item.id)}
+                              title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
 
-                <div className="cms-projects-grid">
-                  {editableProjects.map((p, pi) => (
-                    <div className="cms-proj-card card" key={p.id || pi}>
-                      <div className="cms-proj-thumb-wrap">
-                        <img
-                          src={p.image || "media/pos-v4.jpg"}
-                          alt=""
-                          className="cms-proj-thumb"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "media/pos-v4.jpg";
-                          }}
-                        />
-                        <label className="cms-upload-overlay" title="رەسىم يۈكلەش">
-                          <span>📷 {lang === "tr" ? "Görsel Seç" : "رەسىم يۈكلەش"}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            style={{ display: "none" }}
-                            onChange={(e) => handleProjectImageUpload(pi, e)}
-                          />
-                        </label>
+                        {/* Expandable Project Editor */}
+                        {editingProjectIndex === idx && (
+                          <div className="project-editor-box">
+                            <div className="form">
+                              <div className="grid g2">
+                                <div>
+                                  <label className="est-label">{lang === "tr" ? "Kısa İsim:" : "قىسقا ئىسمى (UKIJ Kufi Tar):"}</label>
+                                  <input
+                                    value={item.name}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setEditableProjects((prev) =>
+                                        prev.map((p, i) => (i === idx ? { ...p, name: val } : p))
+                                      );
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="est-label">{lang === "tr" ? "Kategori:" : "كەسپىي تۈرى:"}</label>
+                                  <input
+                                    value={item.category}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setEditableProjects((prev) =>
+                                        prev.map((p, i) => (i === idx ? { ...p, category: val } : p))
+                                      );
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Tam Başlık:" : "تولۇق نامى:"}</label>
+                                <input
+                                  value={item.title}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEditableProjects((prev) =>
+                                      prev.map((p, i) => (i === idx ? { ...p, title: val } : p))
+                                    );
+                                  }}
+                                />
+                              </div>
+
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Açıklama:" : "قىسقىچە چۈشەندۈرۈشى:"}</label>
+                                <input
+                                  value={item.desc}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEditableProjects((prev) =>
+                                      prev.map((p, i) => (i === idx ? { ...p, desc: val } : p))
+                                    );
+                                  }}
+                                />
+                              </div>
+
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Yeni Görsel Yükle:" : "يېڭى رەسىم يۈكلەش:"}</label>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleProjectImageUpload(idx, e)}
+                                  className="dash-file-input"
+                                />
+                              </div>
+
+                              <button className="btn" onClick={saveShowcaseProjects}>
+                                💾 {lang === "tr" ? "Bu Projeyi Sitede Güncelle" : "بۇ ئەسەرنى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="cms-proj-body">
-                        <div className="cms-proj-actions-top">
-                          <span className="badge">{p.category}</span>
-                          <button
-                            className="btn-tiny danger"
-                            onClick={() => handleDeleteShowcaseProject(p.id)}
-                            title="ئۆچۈرۈش"
-                          >
-                            ✕
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. EDITABLE PROMO ADS WITH IMAGE UPLOAD */}
+                <div className="card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+                    <h3 style={{ margin: 0 }}>📢 {lang === "tr" ? "Kayan Yazı ve Reklam Görselleri" : "سىيرىلما لېنتا ئېلانلىرى ۋە رەسىم يۈكلەش"}</h3>
+                    <button
+                      className="btn"
+                      style={{ padding: "6px 14px", fontSize: 13 }}
+                      onClick={() => setShowAddAdModal((v) => !v)}
+                    >
+                      {showAddAdModal ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "➕ Yeni Reklam Ekle" : "➕ يېڭى ئېلان قوشۇش")}
+                    </button>
+                  </div>
+
+                  {/* Add New Promo Ad Form Modal / Drawer */}
+                  {showAddAdModal && (
+                    <div className="card" style={{ background: "rgba(6, 12, 44, 0.95)", border: "1.5px solid var(--accent)", padding: 18, marginBottom: 16 }}>
+                      <h4 style={{ margin: "0 0 12px", color: "var(--accent)" }}>
+                        📢 {lang === "tr" ? "Yeni Kayan Yazı ve Reklam Ekle" : "يېڭى ئېلان ۋە تەپسىلاتىنى قوشۇش"}
+                      </h4>
+                      <form onSubmit={handleCreatePromoAd} className="form">
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Reklam Metni / Başlığı:" : "ئېلان تېكىستى ۋە مەزمۇنى:"}</label>
+                          <input
+                            value={newAdContent}
+                            onChange={(e) => setNewAdContent(e.target.value)}
+                            placeholder={lang === "tr" ? "Örn: Yeni: Restoran POS sistemi - Özel kampanya" : "مەسىلەن: يېڭى: ئاشخانا POS سىستېمىسى — بىر ھەپتە ئىچىدە قاچىلاش"}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="est-label">{lang === "tr" ? "Reklam Görseli Seç / Yükle:" : "ئېلان رەسىمى تاللاش ۋە يۈكلەش:"}</label>
+                          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                            {newAdImg && (
+                              <img src={newAdImg} alt="" style={{ width: 80, height: 55, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleNewAdImageUpload}
+                              className="dash-file-input"
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                          <button type="submit" className="btn">
+                            💾 {lang === "tr" ? "Reklamı Ekle ve Yayınla" : "ئېلاننى قوشۇش ۋە ئالدى بەتكە يېڭىلاش"}
+                          </button>
+                          <button type="button" className="btn ghost" onClick={() => setShowAddAdModal(false)}>
+                            ✕ {lang === "tr" ? "İptal" : "ئەمەلدىن قالدۇرۇش"}
                           </button>
                         </div>
-                        <input
-                          type="text"
-                          className="cms-input"
-                          placeholder="ئەسەر ماركىسى"
-                          value={p.name}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setEditableProjects((prev) =>
-                              prev.map((item, idx) => (idx === pi ? { ...item, name: val } : item))
-                            );
-                          }}
-                        />
-                        <input
-                          type="text"
-                          className="cms-input bold"
-                          placeholder="ئەسەر تېمىسى"
-                          value={p.title}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setEditableProjects((prev) =>
-                              prev.map((item, idx) => (idx === pi ? { ...item, title: val } : item))
-                            );
-                          }}
-                        />
-                        <input
-                          type="text"
-                          className="cms-input"
-                          placeholder="قىسقىچە چۈشەندۈرۈش"
-                          value={p.desc}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setEditableProjects((prev) =>
-                              prev.map((item, idx) => (idx === pi ? { ...item, desc: val } : item))
-                            );
-                          }}
-                        />
-                        <input
-                          type="text"
-                          className="cms-input tags"
-                          placeholder="تېخنىكىلار (پەش بىلەن ئايرىڭ)"
-                          value={p.tags.join(", ")}
-                          onChange={(e) => {
-                            const val = e.target.value.split(",").map((s) => s.trim()).filter(Boolean);
-                            setEditableProjects((prev) =>
-                              prev.map((item, idx) => (idx === pi ? { ...item, tags: val } : item))
-                            );
-                          }}
-                        />
-                      </div>
+                      </form>
                     </div>
-                  ))}
+                  )}
+
+                  <div className="cms-ads-list">
+                    {editablePromoAds.map((ad, ai) => (
+                      <div className="cms-ad-card-box" key={ad.id || ai}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span className="ad-num">#{ai + 1}</span>
+                            <strong style={{ fontSize: 13 }}>{lang === "tr" ? `Reklam Kalemi ${ai + 1}` : `${ai + 1}-ئېلان كارتىسى`}</strong>
+                          </div>
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "4px 10px", fontSize: 12 }}
+                              onClick={() => setEditingAdIndex(editingAdIndex === ai ? null : ai)}
+                            >
+                              {editingAdIndex === ai ? (lang === "tr" ? "✕ Kapat" : "✕ تاقاش") : (lang === "tr" ? "Düzenle ✏️" : "تەھرىرلەش ✏️")}
+                            </button>
+                            <button
+                              className="btn ghost"
+                              style={{ padding: "4px 8px", fontSize: 12, borderColor: "rgba(239, 68, 68, 0.4)", color: "#ef4444" }}
+                              onClick={() => handleDeletePromoAd(ad.id)}
+                              title={lang === "tr" ? "Sil" : "ئۆچۈرۈش"}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Collapsed Preview */}
+                        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                          <img src={ad.image} alt="" className="ad-thumb-preview" />
+                          <div style={{ flex: 1, fontSize: 13.5, color: "#e2e8f0", lineHeight: 1.5 }}>
+                            {ad.text}
+                          </div>
+                        </div>
+
+                        {/* Expandable Dedicated Edit Window (ئېلان تەھرىرلەش كۆزنىكى) */}
+                        {editingAdIndex === ai && (
+                          <div className="project-editor-box" style={{ marginTop: 12, borderTop: "1px solid rgba(56, 189, 248, 0.25)", paddingTop: 12 }}>
+                            <h4 style={{ margin: "0 0 10px", color: "var(--accent)", fontSize: 13 }}>
+                              ✏️ {lang === "tr" ? `Reklam ${ai + 1} Düzenleme` : `${ai + 1}-ئېلاننى تەھرىرلەش كۆزنىكى`}
+                            </h4>
+                            <div className="form">
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Reklam Metni / Başlığı:" : "ئېلان تېكىستى ۋە مەزمۇنى:"}</label>
+                                <input
+                                  value={ad.text}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEditablePromoAds((prev) =>
+                                      prev.map((x, idx) => (idx === ai ? { ...x, text: val } : x))
+                                    );
+                                  }}
+                                  className="dash-input"
+                                  placeholder="ئېلان تېكىستى كىرگۈزۈڭ..."
+                                />
+                              </div>
+
+                              <div>
+                                <label className="est-label">{lang === "tr" ? "Yeni Görsel Yükle:" : "يېڭى ئېلان رەسىمى يۈكلەش:"}</label>
+                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                                  <img src={ad.image} alt="" style={{ width: 80, height: 50, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleAdImageUpload(ai, e)}
+                                    className="dash-file-input"
+                                  />
+                                </div>
+                              </div>
+
+                              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                                <button className="btn" onClick={savePromoAds}>
+                                  💾 {lang === "tr" ? "Bu Reklamı Kaydet ve Sitede Güncelle" : "بۇ ئېلاننى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
+                                </button>
+                                <button className="btn ghost" onClick={() => setEditingAdIndex(null)}>
+                                  ✕ {lang === "tr" ? "Kapat" : "تاقاش"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    <button className="btn" onClick={savePromoAds} style={{ marginTop: 8 }}>
+                      💾 {lang === "tr" ? "Tüm Reklamları Kaydet ve Sitede Yayınla" : "بارلىق ئېلانلارنى ساقلاش ۋە ئالدى بەتكە يېڭىلاش"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 5: INVOICES & PROPOSALS */}
+          {/* TAB 5: INVOICES & QUOTES */}
           {activeTab === "invoices" && (
             <div className="dash-tab-pane">
               <div className="section-head-row">
                 <div>
-                  <h2>📄 {t.dash.navInvoices}</h2>
+                  <h2>🧾 {t.dash.navInvoices}</h2>
                   <p className="subhead">
                     {lang === "tr"
-                      ? "Müşteriler için profesyonel fatura ve fiyat teklifi oluşturup yazdırın"
-                      : lang === "en"
-                      ? "Generate instant client invoices, proposals and receipt printouts"
-                      : "خېرىدارلار ئۈچۈن كەسپىي ئۆلچەمدىكى باھا تەكلىپنامىسى، تالون ۋە ھۆججەتلەرنى ھازىرلاپ بېسىپ چىقىرىڭ"}
+                      ? "Müşterileriniz için resmi fiyat teklifi ve fatura oluşturun"
+                      : "خېرىدارلار ئۈچۈن رەسمىي، ئالىي دەرىجىلىك ھېسابات تالونى تەييارلاش"}
                   </p>
                 </div>
-                <button
-                  className="btn"
-                  onClick={() => {
-                    window.print();
-                  }}
-                >
-                  🖨️ {lang === "tr" ? "Faturayı Yazdır" : lang === "en" ? "Print Invoice" : "تالوننى چىقىرىش (Print)"}
-                </button>
               </div>
 
-              <div className="invoice-builder-layout">
-                {/* Form to customize invoice */}
+              <div className="dash-invoice-layout">
+                {/* Form */}
                 <div className="card invoice-form-card">
-                  <h3>⚙️ {lang === "tr" ? "Fatura Bilgileri" : lang === "en" ? "Invoice Configuration" : "تالون تەپسىلاتىنى تەھرىرلەش"}</h3>
-                  <div className="form-group">
-                    <label>{lang === "tr" ? "Müşteri / Kurum Adı:" : lang === "en" ? "Client Name:" : "خېرىدار / شىركەت نامى:"}</label>
-                    <input
-                      type="text"
-                      value={invClient}
-                      onChange={(e) => setInvClient(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>{lang === "tr" ? "Hizmet / Proje Tanımı:" : lang === "en" ? "Service Description:" : "تۈر / مۇلازىمەت مەزمۇنى:"}</label>
-                    <input
-                      type="text"
-                      value={invProject}
-                      onChange={(e) => setInvProject(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>{lang === "tr" ? "Toplam Tutar ($):" : lang === "en" ? "Total Price ($):" : "ئومۇمىي سومما ($):"}</label>
-                    <input
-                      type="number"
-                      value={invPrice}
-                      onChange={(e) => setInvPrice(e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>{lang === "tr" ? "Alınan Peşinat (%):" : lang === "en" ? "Deposit (%):" : "تاپشۇرۇلغان كاپالەت پۇلى (%):"}</label>
-                    <input
-                      type="number"
-                      value={invDeposit}
-                      onChange={(e) => setInvDeposit(e.target.value)}
-                    />
+                  <h3>{lang === "tr" ? "Fatura Detayları" : "تالون تەپسىلاتلىرى"}</h3>
+                  <div className="form" style={{ marginTop: 14 }}>
+                    <div>
+                      <label className="est-label">{lang === "tr" ? "Müşteri / Şirket:" : "خېرىدار / شىركەت نامى:"}</label>
+                      <input
+                        required
+                        value={invClient}
+                        onChange={(e) => setInvClient(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="est-label">{lang === "tr" ? "Proje Kapsamı:" : "تۈر ۋە مۇلازىمەت مەزمۇنى:"}</label>
+                      <input
+                        required
+                        value={invProject}
+                        onChange={(e) => setInvProject(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid g2">
+                      <div>
+                        <label className="est-label">{lang === "tr" ? "Toplam Tutar ($):" : "ئومۇمىي سومما ($):"}</label>
+                        <input
+                          type="number"
+                          required
+                          value={invPrice}
+                          onChange={(e) => setInvPrice(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="est-label">{lang === "tr" ? "Ön Avans (%):" : "ئالدىن تۆلەش نىسبىتى (%):"}</label>
+                        <input
+                          type="number"
+                          value={invDeposit}
+                          onChange={(e) => setInvDeposit(e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Printable Invoice Preview */}
-                <div className="card printable-invoice-paper">
-                  <div className="inv-header">
-                    <div className="inv-brand-info">
-                      <h2>{formBrandName || "شەپەق پەن-تېخنىكا مەركىزى"}</h2>
-                      <p>SHAFAQ TECH HUB · DIGITAL INNOVATION STUDIO</p>
-                      <p>Email: {formEmail} · Web: shafaqtech.com</p>
+                {/* Live Invoice Preview Receipt */}
+                <div className="card invoice-preview-card">
+                  <div className="invoice-paper" id="printable-invoice">
+                    <div className="inv-header">
+                      <div>
+                        <h2 style={{ fontFamily: "UKIJ Kufi Tar, sans-serif" }}>{formBrandName || t.brand}</h2>
+                        <div style={{ fontSize: 13, color: "var(--muted)" }}>Shafaq Tech Hub · Official Quotation</div>
+                      </div>
+                      <div className="inv-num-box">
+                        <strong>INVOICE</strong>
+                        <span>#INV-2026-088</span>
+                        <span>{lang === "tr" ? "Tarih: 2026-08-20" : "چېسلا: 2026-08-20"}</span>
+                      </div>
                     </div>
-                    <div className="inv-meta">
-                      <div className="inv-badge">INVOICE / TALON</div>
-                      <p><strong>{lang === "tr" ? "No:" : "نومۇرى:"}</strong> INV-{Date.now().toString().slice(-6)}</p>
-                      <p><strong>{lang === "tr" ? "Tarih:" : "چېسلا:"}</strong> {new Date().toISOString().slice(0, 10)}</p>
+
+                    <div className="inv-divider" />
+
+                    <div className="inv-client-info">
+                      <strong>{lang === "tr" ? "Sayın Müşteri: " : "ھۆرمەتلىك خېرىدار: "}{invClient}</strong>
+                      <div>{lang === "tr" ? "Proje: " : "تۈر: "}{invProject}</div>
                     </div>
-                  </div>
 
-                  <div className="inv-client-box">
-                    <span>{lang === "tr" ? "Sayın / Müşteri:" : lang === "en" ? "Billed To:" : "ھۆرمەتلىك خېرىدار:"}</span>
-                    <h3>{invClient}</h3>
-                  </div>
+                    <table className="inv-table">
+                      <thead>
+                        <tr>
+                          <th>{lang === "tr" ? "Hizmet Kalemi" : "تۈر مەزمۇنى"}</th>
+                          <th>{lang === "tr" ? "Miktar" : "مىقدارى"}</th>
+                          <th>{lang === "tr" ? "Fiyat ($)" : "باھاسى ($)"}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{invProject}</td>
+                          <td>1</td>
+                          <td>${invPrice}</td>
+                        </tr>
+                      </tbody>
+                    </table>
 
-                  <table className="inv-table">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>{lang === "tr" ? "Hizmet Detayı" : lang === "en" ? "Description" : "تۈر ۋە مۇلازىمەت تەپسىلاتى"}</th>
-                        <th>{lang === "tr" ? "Adet" : lang === "en" ? "Qty" : "سانى"}</th>
-                        <th>{lang === "tr" ? "Birim Fiyat" : lang === "en" ? "Unit Price" : "بىرلىك باھا"}</th>
-                        <th>{lang === "tr" ? "Toplam" : lang === "en" ? "Total" : "ئومۇمىي"}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>
-                          <strong>{invProject}</strong>
-                          <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#64748b" }}>
-                            {lang === "tr" ? "Tasarım, geliştirme, test ve 1 yıllık teknik destek dahil" : "لايىھە، كودلاش، سىناق ۋە 1 يىللىق تېخنىكىلىق كاپالەت ئۆز ئىچىگە ئېلىنىدۇ"}
-                          </p>
-                        </td>
-                        <td>1</td>
-                        <td>${invPrice}</td>
-                        <td>${invPrice}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <div className="inv-calc-row">
-                    <div className="inv-notes">
-                      <h4>{lang === "tr" ? "Banka ve İletişim Notları:" : "ئالاقە ۋە ھېسابات ئەسكەرتمىسى:"}</h4>
-                      <p>WhatsApp / Tel: {formWhatsapp}</p>
-                      <p>Telegram: {formTelegram}</p>
-                    </div>
-                    <div className="inv-summary">
-                      <div className="sum-line">
-                        <span>{lang === "tr" ? "Ara Toplam:" : "ئومۇمىي سومما:"}</span>
+                    <div className="inv-totals">
+                      <div className="inv-total-row">
+                        <span>{lang === "tr" ? "Toplam:" : "ئومۇمىي سومما:"}</span>
                         <strong>${invPrice}</strong>
                       </div>
-                      <div className="sum-line">
-                        <span>{lang === "tr" ? `Peşinat (%${invDeposit}):` : `ئالدىن تاپشۇرۇلغان پۇل (%${invDeposit}):`}</span>
+                      <div className="inv-total-row">
+                        <span>{lang === "tr" ? "Ön Avans:" : "ئالدىن تۆلەش:"} ({invDeposit}%):</span>
                         <strong>${Math.round((Number(invPrice) * Number(invDeposit)) / 100)}</strong>
                       </div>
-                      <div className="sum-line total">
-                        <span>{lang === "tr" ? "Kalan Bakiye:" : "قالغان سومما:"}</span>
+                      <div className="inv-total-row final-row">
+                        <span>{lang === "tr" ? "Kalan Bakiye:" : "ئاخىرقى قالدۇق:"}</span>
                         <strong>${Number(invPrice) - Math.round((Number(invPrice) * Number(invDeposit)) / 100)}</strong>
                       </div>
                     </div>
+
+                    <div className="inv-footer-note">
+                      * {lang === "tr" ? "Teknik destek ve bakım garantisi dahildir." : "تېخنىكىلىق كاپالەت ۋە دەسلەپكى ئاسراش مۇلازىمىتى ئۆز ئىچىگە ئېلىنغان."}
+                    </div>
+                  </div>
+
+                  <div className="inv-actions">
+                    <button className="btn" onClick={() => window.print()}>
+                      🖨️ {lang === "tr" ? "Yazdır / PDF Olarak Kaydet" : "بېسىپ چىقىرىش / PDF چۈشۈرۈش"}
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 6: CLOUD POS & HARDWARE NODES */}
+          {/* TAB 6: POS & TELEMETRY */}
           {activeTab === "pos" && (
             <div className="dash-tab-pane">
               <div className="section-head-row">
@@ -1374,50 +1536,44 @@ export default function Dashboard({
                   <h2>🖨️ {t.dash.navPos}</h2>
                   <p className="subhead">
                     {lang === "tr"
-                      ? "Restoran ve mağazalardaki POS terminallerini ve termal yazıcıları canlı izleyin"
-                      : lang === "en"
-                      ? "Realtime telemetry of connected restaurant POS devices, thermal printers and cashier hubs"
-                      : "ئاشخانا ۋە دۇكانلاردىكى ئەقلىي كاسسىر، زاكاز ئېكرانى ۋە تېرمال پىرىنتېرلارنىڭ سىگنال ھالىتى"}
+                      ? "Restoranlara kurulu POS cihazlarının ve yazıcıların bağlantı durumunu gerçek zamanlı izleyin"
+                      : "ئاشخانىلار ۋە كارخانىلارغا قاچىلانغان سىستېمىلارنىڭ تور ھالىتىنى دەل ۋاقتىدا تەكشۈرۈش"}
                   </p>
                 </div>
                 <button className="btn" onClick={pingAllNodes}>
-                  ⚡ {lang === "tr" ? "Tüm Cihazlara Sinyal Gönder" : lang === "en" ? "Ping All Nodes" : "بارلىق ئۈسكۈنىلەرنى سىناش"}
+                  ⚡ {lang === "tr" ? "Tümünü Kontrol Et (Ping All)" : "بارلىق ئۈسكۈنىلەرنى سىناش (Ping All)"}
                 </button>
               </div>
 
-              <div className="pos-nodes-grid">
+              <div className="dash-nodes-grid">
                 {posNodes.map((node) => (
-                  <div className="card pos-node-card" key={node.id}>
-                    <div className="node-card-top">
-                      <div className="node-icon-box">🖨️</div>
-                      <div className="node-status-pill online">
-                        <span className="node-pulse" /> {lang === "tr" ? "Çevrimiçi" : lang === "en" ? "Online" : "ئۇلانغان (Online)"}
-                      </div>
+                  <div className="card node-card" key={node.id}>
+                    <div className="node-card-head">
+                      <span className="node-status-badge">
+                        <span className="live-dot">●</span> {lang === "tr" ? "Çevrimiçi" : "100% توردا"}
+                      </span>
+                      <span className="node-ping-badge">{node.ping} ms</span>
                     </div>
                     <h3 className="node-name">{node.name}</h3>
-                    <div className="node-info-rows">
+                    <div className="node-info-list">
                       <div className="node-info-row">
-                        <span>{lang === "tr" ? "Konum:" : lang === "en" ? "Location:" : "ئورنى:"}</span>
+                        <span>📍 {lang === "tr" ? "Konum:" : "ئورنى:"}</span>
                         <strong>{node.location}</strong>
                       </div>
                       <div className="node-info-row">
-                        <span>{lang === "tr" ? "IP Adresi:" : lang === "en" ? "IP Address:" : "تور ئادرېسى:"}</span>
+                        <span>🌐 IP:</span>
                         <code>{node.ip}</code>
                       </div>
                       <div className="node-info-row">
-                        <span>{lang === "tr" ? "Yazıcı Durumu:" : lang === "en" ? "Printer Status:" : "پىرىنتېر ھالىتى:"}</span>
-                        <strong className="text-success">🟢 {node.printer === "ready" ? "تەييار" : "تەكشۈرۈلۈۋاتىدۇ"}</strong>
+                        <span>🖨️ {lang === "tr" ? "Yazıcı:" : "پىرىنتېر:"}</span>
+                        <strong style={{ color: "#22c55e" }}>{lang === "tr" ? "Hazır (Ready)" : "تەييار (Ready)"}</strong>
                       </div>
                       <div className="node-info-row">
-                        <span>{lang === "tr" ? "Gecikme (Ping):" : lang === "en" ? "Ping:" : "سۈرئىتى (Ping):"}</span>
-                        <strong>{node.ping}ms</strong>
+                        <span>📊 {lang === "tr" ? "Bugünkü Sipariş:" : "بۈگۈنكى زاكاز:"}</span>
+                        <strong>{node.todayOrders}</strong>
                       </div>
                       <div className="node-info-row">
-                        <span>{lang === "tr" ? "Bugünkü Sipariş:" : lang === "en" ? "Today's Orders:" : "بۈگۈنكى زاكاز:"}</span>
-                        <strong>{node.todayOrders} {lang === "tr" ? "Fiş" : "دانە"}</strong>
-                      </div>
-                      <div className="node-info-row">
-                        <span>{lang === "tr" ? "Son Senkronizasyon:" : lang === "en" ? "Last Sync:" : "ئەڭ ئاخىرقى سىگنال:"}</span>
+                        <span>🔄 {lang === "tr" ? "Senkron:" : "ئۇلىنىش:"}</span>
                         <span>{node.lastSync}</span>
                       </div>
                     </div>
@@ -1427,7 +1583,7 @@ export default function Dashboard({
             </div>
           )}
 
-          {/* TAB 7: STUDIO SETTINGS */}
+          {/* TAB 7: SETTINGS */}
           {activeTab === "settings" && (
             <div className="dash-tab-pane">
               <div className="section-head-row">
@@ -1435,240 +1591,162 @@ export default function Dashboard({
                   <h2>⚙️ {t.dash.navSettings}</h2>
                   <p className="subhead">
                     {lang === "tr"
-                      ? "Stüdyo adı, WhatsApp ve Telegram iletişim kanallarını tek merkezden güncelleyin"
-                      : lang === "en"
-                      ? "Global studio brand identity, WhatsApp and Telegram channels"
-                      : "شىركەت نامى، WhatsApp، Telegram قاتارلىق بارلىق ئۇچۇرلارنى بىرلا جايدىن تۈزىتىڭ"}
+                      ? "Stüdyo profili ve iletişim bilgilerini güncelleyin (Değişiklikler anında web sitesine yansır)"
+                      : "ئىستۇدىيە ئۇچۇرلىرىنى ئۆزگەرتىپ ساقلاڭ (ئۆزگىرىشلەر شۇ ھامان ئالدى بەتكە يېڭىلىنىدۇ)"}
                   </p>
                 </div>
               </div>
 
-              <div className="card settings-form-card">
-                <form onSubmit={saveSettings} className="est-form">
-                  <div className="est-grid">
-                    <div className="est-field">
-                      <label className="est-label">{lang === "tr" ? "Stüdyo / Marka Adı:" : lang === "en" ? "Brand Name:" : "ستۇدىيە / شىركەت نامى:"}</label>
+              <div className="grid g2">
+                <div className="card">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                    <span style={{ fontSize: 22 }}>👤</span>
+                    <h3 style={{ margin: 0 }}>{lang === "tr" ? "Stüdyo Bilgileri" : "ئىستۇدىيە ئۇچۇرلىرى"}</h3>
+                  </div>
+
+                  <form onSubmit={saveSettings} className="form">
+                    <div>
+                      <label className="est-label">{lang === "tr" ? "İsim / Başlık (UG / TR / EN):" : "ئىستۇدىيە نامى (UG / TR / EN):"}</label>
                       <input
-                        type="text"
-                        className="est-input"
-                        placeholder="شەپەق پەن-تېخنىكا سۇپىسى"
+                        required
                         value={formBrandName}
                         onChange={(e) => setFormBrandName(e.target.value)}
+                        placeholder="شەپەق تېخنىكا سەھىپىسى"
                       />
                     </div>
-
-                    <div className="est-field">
+                    <div>
                       <label className="est-label">WhatsApp:</label>
                       <input
-                        type="text"
-                        className="est-input"
+                        required
                         value={formWhatsapp}
                         onChange={(e) => setFormWhatsapp(e.target.value)}
+                        placeholder="+86 130 0000 0000"
+                        dir="ltr"
                       />
                     </div>
-
-                    <div className="est-field">
+                    <div>
                       <label className="est-label">Telegram:</label>
                       <input
-                        type="text"
-                        className="est-input"
+                        required
                         value={formTelegram}
                         onChange={(e) => setFormTelegram(e.target.value)}
+                        placeholder="@shafaq_tech"
+                        dir="ltr"
                       />
                     </div>
-
-                    <div className="est-field">
+                    <div>
                       <label className="est-label">Email:</label>
                       <input
                         type="email"
-                        className="est-input"
+                        required
                         value={formEmail}
                         onChange={(e) => setFormEmail(e.target.value)}
+                        placeholder="contact@shafaqtech.com"
+                        dir="ltr"
                       />
                     </div>
+
+                    <button className="btn" type="submit" style={{ marginTop: 8 }}>
+                      💾 {lang === "tr" ? "Ayarları Kaydet ve Sitede Yayınla" : "تەڭشەكلەرنى ساقلاش"}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="card">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                    <span style={{ fontSize: 22 }}>🔒</span>
+                    <h3 style={{ margin: 0 }}>{lang === "tr" ? "Güvenlik & Yedekleme" : "بىخەتەرلىك & سانلىق مەلۇمات"}</h3>
                   </div>
 
-                  <div style={{ marginTop: "24px" }}>
-                    <button type="submit" className="btn">
-                      💾 {lang === "tr" ? "Tüm Ayarları Kaydet" : lang === "en" ? "Save All Settings" : "بارلىق تەڭشەكلەرنى ساقلاش"}
-                    </button>
+                  <div style={{ display: "grid", gap: 14 }}>
+                    <div className="security-item">
+                      <div>
+                        <strong>{lang === "tr" ? "İki Aşamalı Doğrulama (2FA)" : "ئىككى باسقۇچلۇق دەلىللەش (2FA)"}</strong>
+                        <p style={{ fontSize: 13, color: "var(--muted)" }}>{lang === "tr" ? "Hesap güvenliği aktif" : "ھېسابات بىخەتەرلىكى قوغدالغان"}</p>
+                      </div>
+                      <span className="kpi-badge-positive">{lang === "tr" ? "Aktif" : "ئاكتىپ"}</span>
+                    </div>
+
+                    <div className="security-item">
+                      <div>
+                        <strong>{lang === "tr" ? "Tam Veri Yedekleme (JSON)" : "سانلىق مەلۇماتلارنى تولۇق زاپاسلاش (Backup)"}</strong>
+                        <p style={{ fontSize: 13, color: "var(--muted)" }}>{lang === "tr" ? "Tüm projeleri ve müşteri CRM verilerini indir" : "تۈرلەر، ئېلانلار ۋە CRM ئۇچۇرلىرىنى JSON قىلىپ چۈشۈرۈش"}</p>
+                      </div>
+                      <button
+                        className="btn ghost"
+                        type="button"
+                        onClick={() => {
+                          const backupData = {
+                            settings: {
+                              brandName: formBrandName,
+                              whatsapp: formWhatsapp,
+                              telegram: formTelegram,
+                              email: formEmail,
+                              wechat: formWechat,
+                            },
+                            promoAds: editablePromoAds,
+                            showcaseProjects: editableProjects,
+                            leads,
+                            projects,
+                            posNodes,
+                          };
+                          const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = `shafaq-tech-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                          a.click();
+                          onShowToast(lang === "tr" ? "Yedekleme JSON indirildi!" : "سانلىق مەلۇماتلار زاپاسلاندى!");
+                        }}
+                      >
+                        {lang === "tr" ? "İndir 📥" : "چۈشۈرۈۋېلىش 📥"}
+                      </button>
+                    </div>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           )}
         </main>
       </div>
 
-      {/* ADD NEW PROJECT MODAL */}
+      {/* Add Kanban Project Modal */}
       {showAddProject && (
-        <div className="modal-veil" onClick={() => setShowAddProject(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>+ {lang === "tr" ? "Yeni Proje Ekle" : lang === "en" ? "Add New Project" : "يېڭى تۈر قوشۇش"}</h3>
-              <button className="modal-close" onClick={() => setShowAddProject(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleAddProject} className="est-form">
-                <div className="est-field">
-                  <label className="est-label">{lang === "tr" ? "Proje Başlığı:" : lang === "en" ? "Project Title:" : "تۈر نامى:"}</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: ئاشخانا ئەقلىي POS زاكاز سىستېمىسى"
-                    value={newProjTitle}
-                    onChange={(e) => setNewProjTitle(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">{lang === "tr" ? "Müşteri Adı:" : lang === "en" ? "Client Name:" : "خېرىدار نامى:"}</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: شەپەق لەغمەن سارىيى"
-                    value={newProjClient}
-                    onChange={(e) => setNewProjClient(e.target.value)}
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">{lang === "tr" ? "Bütçe ($):" : lang === "en" ? "Budget ($):" : "خامچوت ($):"}</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="تۈر خامچوتى (مەسىلەن: $1,200)"
-                    value={newProjBudget}
-                    onChange={(e) => setNewProjBudget(e.target.value)}
-                  />
-                </div>
-                <div style={{ marginTop: "16px" }}>
-                  <button type="submit" className="btn">
-                    + {lang === "tr" ? "Panoya Ekle" : lang === "en" ? "Add to Board" : "تاختىغا قوشۇش"}
+        <div className="modal-backdrop" onClick={() => setShowAddProject(false)}>
+          <div className="modal-card small-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowAddProject(false)}>
+              ✕
+            </button>
+            <div className="modal-content">
+              <h3 style={{ marginBottom: 14 }}>+ {lang === "tr" ? "Yeni Proje Ekle" : "يېڭى تۈر قوشۇش"}</h3>
+              <form onSubmit={handleAddProject} className="form">
+                <input
+                  required
+                  placeholder={lang === "tr" ? "Proje adı..." : "تۈر نامى..."}
+                  value={newProjTitle}
+                  onChange={(e) => setNewProjTitle(e.target.value)}
+                />
+                <input
+                  required
+                  placeholder={lang === "tr" ? "Müşteri veya şirket adı..." : "خېرىدار ياكى شىركەت نامى..."}
+                  value={newProjClient}
+                  onChange={(e) => setNewProjClient(e.target.value)}
+                />
+                <input
+                  placeholder={lang === "tr" ? "Bütçe (örn: $1,200)" : "تۈر خامچوتى (مەسىلەن: $1,200)"}
+                  value={newProjBudget}
+                  onChange={(e) => setNewProjBudget(e.target.value)}
+                />
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <button className="btn" type="submit">
+                    {lang === "tr" ? "Ekle" : "قوشۇش"}
                   </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ADD NEW SHOWCASE PROJECT MODAL */}
-      {showAddProjectModal && (
-        <div className="modal-veil" onClick={() => setShowAddProjectModal(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>+ {lang === "tr" ? "Yeni Vitrin Eseri Ekle" : "يېڭى ئەسەر كۆرگەزمىسى قوشۇش"}</h3>
-              <button className="modal-close" onClick={() => setShowAddProjectModal(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleCreateShowcaseProject} className="est-form">
-                <div className="est-field">
-                  <label className="est-label">ماركا / تۈرقىسقا نامى:</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: رىستۇران"
-                    value={newProjName}
-                    onChange={(e) => setNewProjName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">ئەسەر تولۇق تېمىسى:</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: كۆپ تىللىق ئەقلىي ئاشخانا ۋە QR زاكاز سىستېمىسى"
-                    value={newProjTitleCms}
-                    onChange={(e) => setNewProjTitleCms(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">تۈرى (Category):</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: ئاشخانا ۋە مېھمانساراي تېخنىكىسى"
-                    value={newProjCategory}
-                    onChange={(e) => setNewProjCategory(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">تەپسىلىي چۈشەندۈرۈش:</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="مەسىلەن: كۆپ تىللىق زاكاز ۋە ئاشپەز ئېكرانى"
-                    value={newProjDesc}
-                    onChange={(e) => setNewProjDesc(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">ئىشلىتىلگەن تېخنىكىلار (پەش بىلەن ئايرىڭ):</label>
-                  <input
-                    type="text"
-                    className="est-input"
-                    placeholder="React, TypeScript, QR Menu, Thermal Print"
-                    value={newProjTags}
-                    onChange={(e) => setNewProjTags(e.target.value)}
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">ئەسەر رەسىمى يۈكلەش:</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="est-input"
-                    onChange={handleNewProjectImageUpload}
-                  />
-                </div>
-                <div style={{ marginTop: "16px" }}>
-                  <button type="submit" className="btn">
-                    + {lang === "tr" ? "Eseri Yayınla" : "ئەسەرنى ئېلان قىلىش ✨"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ADD NEW PROMO AD MODAL */}
-      {showAddAdModal && (
-        <div className="modal-veil" onClick={() => setShowAddAdModal(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>+ {lang === "tr" ? "Yeni Reklam Ekle" : "يېڭى پائالىيەت ئېلانى قوشۇش"}</h3>
-              <button className="modal-close" onClick={() => setShowAddAdModal(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleCreatePromoAd} className="est-form">
-                <div className="est-field">
-                  <label className="est-label">ئېلان تېكىستى:</label>
-                  <textarea
-                    rows={3}
-                    className="est-input"
-                    placeholder="مەسىلەن: يېڭى: كۆپ تىللىق ئاشخانا POS — بىر ھەپتە ئىچىدە ئورنىتىش"
-                    value={newAdContent}
-                    onChange={(e) => setNewAdContent(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="est-field">
-                  <label className="est-label">ئېلان كۆرۈنمە رەسىمى:</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="est-input"
-                    onChange={handleNewAdImageUpload}
-                  />
-                </div>
-                <div style={{ marginTop: "16px" }}>
-                  <button type="submit" className="btn">
-                    + {lang === "tr" ? "Reklamı Yayınla" : "ئېلاننى ئېلان قىلىش 📢"}
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={() => setShowAddProject(false)}
+                  >
+                    {lang === "tr" ? "İptal" : "بىكار قىلىش"}
                   </button>
                 </div>
               </form>

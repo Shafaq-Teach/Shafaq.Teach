@@ -1003,4 +1003,649 @@ export default function App() {
                     {
                       border: isDark ? "#c084fc" : "#8b5cf6",
                       glow: isDark ? "rgba(168, 85, 247, 0.45)" : "rgba(139, 92, 246, 0.25)",
-                      bgDark: "linear-gradient(135deg, rgba(109, 40, 217, 0.65) 0%, rgba(55, 18, 115, 0.88) 100%)\",\n                      bgLight: \"linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)\",\n                      badgeColor: isDark ? \"#f3e8ff\" : \"#6d28d9\",\n                      badgeBorder: isDark ? \"#c084fc\" : \"#8b5cf6\",\n                      badgeBg: isDark ? \"rgba(168, 85, 247, 0.35)\" : \"#ffffff\",\n                      textColor: isDark ? \"#ffffff\" : \"#2e1065\",\n                      textShadow: isDark ? \"0 2px 6px rgba(0, 0, 0, 0.75)\" : \"none\",\n                    },\n                    // Card 1: Vibrant Sunset Amber / Fire Gold\n                    {\n                      border: isDark ? \"#fbbf24\" : \"#d97706\",\n                      glow: isDark ? \"rgba(245, 158, 11, 0.45)\" : \"rgba(217, 119, 6, 0.25)\",\n                      bgDark: \"linear-gradient(135deg, rgba(180, 83, 9, 0.7) 0%, rgba(95, 35, 5, 0.9) 100%)\",\n                      bgLight: \"linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)\",\n                      badgeColor: isDark ? \"#fef08a\" : \"#92400e\",\n                      badgeBorder: isDark ? \"#fbbf24\" : \"#d97706\",\n                      badgeBg: isDark ? \"rgba(245, 158, 11, 0.35)\" : \"#ffffff\",\n                      textColor: isDark ? \"#ffffff\" : \"#451a03\",\n                      textShadow: isDark ? \"0 2px 6px rgba(0, 0, 0, 0.75)\" : \"none\",\n                    },\n                    // Card 2: Cyber Emerald / Mint Jade\n                    {\n                      border: isDark ? \"#34d399\" : \"#16a34a\",\n                      glow: isDark ? \"rgba(16, 185, 129, 0.5)\" : \"rgba(22, 163, 74, 0.25)\",\n                      bgDark: \"linear-gradient(135deg, rgba(5, 150, 105, 0.7) 0%, rgba(4, 47, 36, 0.92) 100%)\",\n                      bgLight: \"linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)\",\n                      badgeColor: isDark ? \"#a7f3d0\" : \"#14532d\",\n                      badgeBorder: isDark ? \"#34d399\" : \"#16a34a\",\n                      badgeBg: isDark ? \"rgba(16, 185, 129, 0.35)\" : \"#ffffff\",\n                      textColor: isDark ? \"#ffffff\" : \"#022c22\",\n                      textShadow: isDark ? \"0 2px 6px rgba(0, 0, 0, 0.75)\" : \"none\",\n                    },\n                  ];\n\n                  const conf = themeConfigs[ci] || themeConfigs[0];\n\n                  return (\n                    <div\n                      className={`hero-prop-card hero-prop-${ci}`}\n                      key={ci}\n                      style={{\n                        background: isDark ? conf.bgDark : conf.bgLight,\n                        border: `2px solid ${conf.border}`,\n                        boxShadow: `0 10px 28px ${conf.glow}`,\n                      }}\n                    >\n                      <div className=\"hero-prop-card-head\">\n                        <span\n                          className=\"hero-prop-badge\"\n                          style={{\n                            borderColor: conf.badgeBorder,\n                            color: conf.badgeColor,\n                            background: conf.badgeBg,\n                          }}\n                        >\n                          <span style={{ fontSize: 13 }}>{card.icon}</span> {card.badge}\n                        </span>\n                      </div>\n\n                      <p\n                        className=\"hero-prop-text\"\n                        style={{\n                          color: conf.textColor,\n                          textShadow: conf.textShadow,\n                          textAlign: \"center\",\n                        }}\n                      >\n                        «{card.text}»\n                      </p>\n\n                      {\"btnText\" in card && (card as any).btnText && (\n                        <button\n                          className=\"hero-prop-btn\"\n                          style={{\n                            background: isDark\n                              ? \"linear-gradient(135deg, #22c55e, #16a34a)\"\n                              : \"linear-gradient(135deg, #16a34a, #15803d)\",\n                            color: \"#ffffff\",\n                            border: isDark ? \"1px solid #86efac\" : \"none\",\n                            boxShadow: isDark\n                              ? \"0 4px 18px rgba(34, 197, 94, 0.55)\"\n                              : \"0 4px 14px rgba(22, 163, 74, 0.35)\",\n                          }}\n                          onClick={() => {\n                            document.getElementById(\"contact\")?.scrollIntoView({ behavior: \"smooth\" });\n                          }}\n                        >\n                          {(card as any).btnText}\n                        </button>\n                      )}\n                    </div>\n                  );\n                })}\n              </div>\n            </div>\n          </section>\n        )}\n\n        {/* 🌟 STATS BAR — LUXURIOUS ENHANCED CARDS */}\n        <section className=\"section stats-sec\">\n          <div className=\"section-head text-center\">\n            <h2>{t.statsTitle}</h2>\n          </div>\n          <div className=\"stats-cards-grid\">\n            {t.stats.map((st, i) => {\n              const p = STAT_PRESETS[i] || STAT_PRESETS[0];\n              const isDark = mode === \"dark\";\n              const badgeText = lang === \"tr\" ? p.badgeTr : lang === \"en\" ? p.badgeEn : lang === \"ar\" ? p.badgeAr : p.badgeUg;\n              return (\n                <div\n                  className=\"stat-card-luxury\"\n                  key={i}\n                  style={{\n                    background: isDark ? p.bgDark : p.bgLight,\n                    border: `2px solid ${p.border}`,\n                    boxShadow: `0 12px 32px ${isDark ? p.glow : \"rgba(0,0,0,0.06)\"}`,\n                  }}\n                >\n                  <div className=\"stat-card-top\">\n                    <span className=\"stat-badge-chip\" style={{ borderColor: p.border, color: isDark ? \"#fff\" : \"#111\" }}>\n                      <span className=\"stat-icon\">{p.icon}</span> {badgeText}\n                    </span>\n                  </div>\n                  <div\n                    className=\"stat-number-display\"\n                    style={{\n                      color: isDark ? p.numDark : p.numLight,\n                      textShadow: isDark ? `0 0 20px ${p.glow}` : \"none\",\n                    }}\n                  >\n                    {st.val}\n                  </div>\n                  <h3 className=\"stat-title-text\" style={{ color: isDark ? \"#f8fafc\" : \"#0f172a\" }}>\n                    {st.label}\n                  </h3>\n                  <p className=\"stat-sub-text\" style={{ color: isDark ? \"#94a3b8\" : \"#475569\" }}>\n                    {st.sub}\n                  </p>\n                </div>\n              );\n            })}\n          </div>\n        </section>\n\n        {/* ABOUT */}\n        {(page === \"home\" || page === \"about\") && (\n          <section id=\"about\" className=\"section about-sec\">\n            <img className=\"about-bg\" src={aboutBg} alt=\"\" />\n            <div className=\"about-inner\">\n              <h2>{t.aboutTitle}</h2>\n              <p>{t.about}</p>\n              <p className=\"about-wish\">{t.aboutWish}</p>\n            </div>\n          </section>\n        )}\n\n        {/* SERVICES */}\n        {(page === \"home\" || page === \"services\") && (\n          <section id=\"services\" className=\"section\">\n            <div className=\"section-head\">\n              <div className=\"kicker\">{t.kicker}</div>\n              <h2>{t.servicesTitle}</h2>\n            </div>\n            <div className=\"grid col-3\">\n              {t.services.map((s, i) => (\n                <div className=\"card service-card\" key={i}>\n                  <div className=\"card-top\">\n                    <span className=\"badge\">{s.t}</span>\n                  </div>\n                  <h3>{s.t}</h3>\n                  <p>{s.d}</p>\n                </div>\n              ))}\n            </div>\n          </section>\n        )}\n\n        {/* 🚀 LIVE PROMO & SPECIAL OFFERS BANNER CAROUSEL */}\n        {promoAds && promoAds.length > 0 && (\n          <section className=\"section promo-carousel-sec\">\n            <div className=\"promo-carousel-container\">\n              <div className=\"promo-carousel-head\">\n                <div className=\"promo-badge-tag\">\n                  <span className=\"promo-pulse-dot\" />\n                  <span>{lang === \"ug\" ? \"ئالاھىدە پائالىيەت ۋە ئېتىبارلار\" : lang === \"ar\" ? \"العروض والخصومات الخاصة\" : lang === \"tr\" ? \"Özel Kampanyalar & İndirimler\" : \"Special Offers & Discounts\"}</span>\n                </div>\n                <div className=\"promo-nav-buttons\">\n                  <button\n                    className=\"promo-nav-btn\"\n                    onClick={handlePrevPromo}\n                    aria-label=\"Previous Offer\"\n                    title={dir === \"rtl\" ? \"كېيىنكىسى\" : \"Previous\"}\n                  >\n                    {dir === \"rtl\" ? \"❯\" : \"❮\"}\n                  </button>\n                  <button\n                    className=\"promo-nav-btn\"\n                    onClick={handleNextPromo}\n                    aria-label=\"Next Offer\"\n                    title={dir === \"rtl\" ? \"ئالدىنقىسى\" : \"Next\"}\n                  >\n                    {dir === \"rtl\" ? \"❮\" : \"❯\"}\n                  </button>\n                </div>\n              </div>\n\n              {/* Promo Cards Viewport */}\n              <div className=\"promo-cards-viewport\">\n                <div\n                  className=\"promo-cards-track\"\n                  style={{\n                    transform: isMobileScreen()\n                      ? (dir === \"rtl\" ? `translateX(${promoIndex * 100}%)` : `translateX(-${promoIndex * 100}%)`)\n                      : (dir === \"rtl\" ? `translateX(${promoIndex * 50}%)` : `translateX(-${promoIndex * 50}%)`),\n                    transition: \"transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)\",\n                  }}\n                >\n                  {promoAds.map((ad, idx) => (\n                    <div className=\"promo-card\" key={ad.id || idx}>\n                      <div className=\"promo-card-img-wrap\">\n                        <img\n                          src={ad.image || \"media/pos-v4.jpg\"}\n                          alt={ad.text}\n                          className=\"promo-card-img\"\n                          onError={(e) => {\n                            (e.target as HTMLImageElement).src = \"media/pos-v4.jpg\";\n                          }}\n                        />\n                        <div className=\"promo-card-overlay\" />\n                        <span className=\"promo-card-pill\">🔥 {lang === \"ug\" ? \"قىزىق تەۋسىيە\" : lang === \"ar\" ? \"عرض حصري\" : lang === \"tr\" ? \"Fırsat\" : \"Hot Offer\"}</span>\n                      </div>\n                      <div className=\"promo-card-body\">\n                        <p className=\"promo-card-text\">{ad.text}</p>\n                        <button\n                          className=\"promo-card-action-btn\"\n                          onClick={() => {\n                            setContactMessage(`[پائالىيەت سۈرۈشتۈرۈش: ${ad.text}]\\n\\nمۇشۇ ئېتىبار پائالىيەت توغرىسىدا تەپسىلىي ئۇچۇر ئالماقچى:`);\n                            document.getElementById(\"contact\")?.scrollIntoView({ behavior: \"smooth\" });\n                          }}\n                        >\n                          <span>{lang === \"ug\" ? \"سۈرۈشتۈرۈش\" : lang === \"ar\" ? \"استفسار الآن\" : lang === \"tr\" ? \"Bilgi Al\" : \"Inquire Now\"}</span>\n                          <span>{dir === \"rtl\" ? \"←\" : \"→\"}</span>\n                        </button>\n                      </div>\n                    </div>\n                  ))}\n                </div>\n              </div>\n\n              {/* Dot Indicators */}\n              {promoAds.length > 1 && (\n                <div className=\"promo-dots\">\n                  {promoAds.map((_, dotIdx) => (\n                    <button\n                      key={dotIdx}\n                      className={`promo-dot ${dotIdx === promoIndex ? \"active\" : \"\"}`}\n                      onClick={() => setPromoIndex(dotIdx)}\n                      aria-label={`Go to slide ${dotIdx + 1}`}\n                    />\n                  ))}\n                </div>\n              )}\n            </div>\n          </section>\n        )}\n\n        {/* WORK / SHOWCASE SECTION */}\n        {(page === \"home\" || page === \"work\") && (\n          <section id=\"work\" className=\"section\">\n            <div className=\"section-head\">\n              <div className=\"kicker\">{t.kicker}</div>\n              <h2>{t.workTitle}</h2>\n            </div>\n\n            {/* Custom Interactive Tabs / Showcase Cards */}\n            <div className=\"grid col-2 work-grid-v2\">\n              {showcaseProjects.map((item, idx) => (\n                <div\n                  className=\"card work-card-v2\"\n                  key={item.id || idx}\n                  onClick={() => selectProjectForInquiry(idx % t.projectDetails.length)}\n                  style={{ cursor: \"pointer\" }}\n                >\n                  <div className=\"work-thumb-wrap\">\n                    <img\n                      className=\"work-thumb\"\n                      src={item.image || \"media/pos-v4.jpg\"}\n                      alt={item.title}\n                      onError={(e) => {\n                        (e.target as HTMLImageElement).src = \"media/pos-v4.jpg\";\n                      }}\n                    />\n                    <div className=\"work-thumb-badge\">\n                      <span className=\"badge\" style={{ background: \"rgba(10, 15, 29, 0.85)\", color: \"#38bdf8\", border: \"1px solid #0284c7\" }}>\n                        {item.category}\n                      </span>\n                    </div>\n                  </div>\n                  <div className=\"work-card-info\">\n                    <div className=\"work-card-meta-row\">\n                      <span\n                        className=\"work-brand-tag\"\n                        style={{\n                          color: item.nameColor || WORK_NAME_COLORS[idx % WORK_NAME_COLORS.length],\n                          fontWeight: 700,\n                        }}\n                      >\n                        {item.name}\n                      </span>\n                      <span\n                        className=\"work-desc-tag\"\n                        style={{\n                          color: item.descColor || WORK_DESC_COLORS[idx % WORK_DESC_COLORS.length],\n                          fontSize: 13,\n                        }}\n                      >\n                        {item.desc}\n                      </span>\n                    </div>\n                    <h3 className=\"work-title\">{item.title}</h3>\n                    <div className=\"tags-cloud\">\n                      {item.tags.map((tg, ti) => (\n                        <span className=\"tech-tag\" key={ti}>\n                          {tg}\n                        </span>\n                      ))}\n                    </div>\n                    <div className=\"work-inquiry-hint\">\n                      <span>{lang === \"ug\" ? \"سۈرۈشتۈرۈش ۋە زاكاز قىلىش\" : lang === \"ar\" ? \"طلب استفسار أو عرض سعر\" : lang === \"tr\" ? \"Fiyat ve Süreç İste\" : \"Inquire & Order Similar\"}</span>\n                      <span className=\"arrow\">{dir === \"rtl\" ? \"←\" : \"→\"}</span>\n                    </div>\n                  </div>\n                </div>\n              ))}\n            </div>\n          </section>\n        )}\n\n        {/* PROCESS */}\n        {(page === \"home\" || page === \"process\") && (\n          <section id=\"process\" className=\"section\">\n            <div className=\"section-head\">\n              <div className=\"kicker\">{t.kicker}</div>\n              <h2>{t.processTitle}</h2>\n            </div>\n            <div className=\"process-grid\">\n              {t.steps.map((st, i) => (\n                <div className=\"process-card\" key={i}>\n                  <div className=\"process-img-wrap\">\n                    <img className=\"process-img\" src={stepImgs[i]} alt={st} />\n                    <span className=\"step-badge\">0{i + 1}</span>\n                  </div>\n                  <div className=\"process-text\">\n                    <h3>{st}</h3>\n                  </div>\n                </div>\n              ))}\n            </div>\n          </section>\n        )}\n\n        {/* CONTACT */}\n        <section id=\"contact\" className=\"section contact-sec\">\n          <div className=\"section-head\">\n            <div className=\"kicker\">{t.kicker}</div>\n            <h2>{t.contactTitle}</h2>\n          </div>\n\n          <div className=\"contact-wrap\">\n            {/* Direct Contact Buttons */}\n            <div className=\"contact-methods\">\n              <a\n                href={`https://wa.me/${rawWhatsapp}`}\n                target=\"_blank\"\n                rel=\"noopener noreferrer\"\n                className=\"contact-card wa-card\"\n              >\n                <div className=\"contact-icon\">💬</div>\n                <div className=\"contact-details\">\n                  <h4>WhatsApp</h4>\n                  <p>{settings.whatsapp || \"+86 130 0000 0000\"}</p>\n                  <span className=\"contact-badge\">{lang === \"ug\" ? \"دەرھال جاۋاب\" : lang === \"ar\" ? \"رد فوري\" : lang === \"tr\" ? \"Hızlı Yanıt\" : \"Instant Reply\"}</span>\n                </div>\n              </a>\n\n              <a\n                href={`https://t.me/${rawTelegram}`}\n                target=\"_blank\"\n                rel=\"noopener noreferrer\"\n                className=\"contact-card tg-card\"\n              >\n                <div className=\"contact-icon\">✈️</div>\n                <div className=\"contact-details\">\n                  <h4>Telegram</h4>\n                  <p>{settings.telegram || \"@shafaq_tech\"}</p>\n                  <span className=\"contact-badge\">{lang === \"ug\" ? \"دەل ۋاقتىدا\" : lang === \"ar\" ? \"متصل دائماً\" : lang === \"tr\" ? \"Çevrimiçi\" : \"Always Online\"}</span>\n                </div>\n              </a>\n\n              <div className=\"contact-card email-card\" onClick={copyEmail} style={{ cursor: \"pointer\" }}>\n                <div className=\"contact-icon\">✉️</div>\n                <div className=\"contact-details\">\n                  <h4>Email</h4>\n                  <p>{settings.email || \"contact@shafaqtech.com\"}</p>\n                  <span className=\"contact-badge\">{lang === \"ug\" ? \"كۆچۈرۈۋېلىش\" : lang === \"ar\" ? \"نسخ البريد\" : lang === \"tr\" ? \"Kopyala\" : \"Click to Copy\"}</span>\n                </div>\n              </div>\n            </div>\n\n            {/* Quick Contact / Request Form */}\n            <form\n              className=\"contact-form\"\n              onSubmit={(e) => {\n                e.preventDefault();\n                if (!contactName.trim()) {\n                  showToast(lang === \"ug\" ? \"ئىسمىڭىزنى يېزىڭ\" : \"Please enter name\");\n                  return;\n                }\n\n                // Add to leads automatically\n                const newLead: LeadItem = {\n                  id: \"L\" + Date.now().toString().slice(-4),\n                  name: contactName,\n                  contact: contactEmail,\n                  service: \"تور بېكەت / يۇمشاق دېتال تەلەپ\",\n                  estDays: \"3-5 كۈن\",\n                  date: new Date().toISOString().slice(0, 10),\n                  status: \"new\",\n                  note: contactMessage,\n                };\n                updateLeads([newLead, ...leads]);\n\n                showToast(lang === \"ug\" ? \"✅ ئۇچۇرىڭىز تاپشۇرۇلدى! سىز بىلەن ئالاقىلىشىمىز.\" : \"✅ Message sent! We will contact you soon.\");\n                setContactName(\"\");\n                setContactEmail(\"\");\n                setContactMessage(\"\");\n              }}\n            >\n              <h3 style={{ margin: \"0 0 16px 0\", fontSize: 18, color: \"var(--text-color)\" }}>\n                {lang === \"ug\" ? \"تۈر سۈرۈشتۈرۈش ياكى باھا تەلەپ قىلىش\" : lang === \"ar\" ? \"طلب استشارة أو عرض أسعار\" : lang === \"tr\" ? \"Proje veya Teklif Talebi\" : \"Project Inquiry / Request Quote\"}\n              </h3>\n              <div className=\"form-group\">\n                <input\n                  type=\"text\"\n                  placeholder={lang === \"ug\" ? \"ئىسمىڭىز (مەسىلەن: ئەلى)\" : lang === \"ar\" ? \"اسمك الكريم\" : lang === \"tr\" ? \"Adınız\" : \"Your Name\"}\n                  value={contactName}\n                  onChange={(e) => setContactName(e.target.value)}\n                  required\n                />\n              </div>\n              <div className=\"form-group\">\n                <input\n                  type=\"text\"\n                  placeholder={lang === \"ug\" ? \"تېلېفون ياكى WhatsApp / Telegram ئادرېسىڭىز\" : lang === \"ar\" ? \"رقم الهاتف أو WhatsApp\" : lang === \"tr\" ? \"Telefon veya İletişim Bilgisi\" : \"Phone / WhatsApp / Contact Info\"}\n                  value={contactEmail}\n                  onChange={(e) => setContactEmail(e.target.value)}\n                  required\n                />\n              </div>\n              <div className=\"form-group\">\n                <textarea\n                  rows={4}\n                  placeholder={lang === \"ug\" ? \"تۈر ھەققىدە قىسقىچە تەلەپلىرىڭىزنى يېزىڭ...\" : lang === \"ar\" ? \"اكتب تفاصيل طلبك هنا...\" : lang === \"tr\" ? \"Projeniz hakkında kısa bilgi verin...\" : \"Tell us briefly about your project...\"}\n                  value={contactMessage}\n                  onChange={(e) => setContactMessage(e.target.value)}\n                />\n              </div>\n              <button type="submit" className="btn submit-btn">\n                {lang === \"ug\" ? \"يوللاش 🚀\" : lang === \"ar\" ? \"إرسال 🚀\" : lang === \"tr\" ? \"Gönder 🚀\" : \"Submit Request 🚀\"}\n              </button>\n            </form>\n          </div>\n        </section>\n      </main>\n\n      {/* FOOTER */}\n      <footer className=\"footer\">\n        <div className=\"wrap footer-inner\">\n          <div className=\"footer-brand\">\n            <img className=\"logo\" src={logo} alt={displayBrand} width={38} height={38} />\n            <span className=\"brand-name\">{displayBrand}</span>\n          </div>\n          <div className=\"footer-copy\">\n            © {new Date().getFullYear()} {displayBrand}. All rights reserved.\n          </div>\n        </div>\n      </footer>\n\n      {/* ADMIN AUTH MODAL */}\n      <AdminAuthModal\n        isOpen={authModalOpen}\n        onClose={handleAuthClose}\n        onSuccess={handleAuthSuccess}\n        lang={lang}\n        credentials={credentials}\n        onUpdateCredentials={updateCredentials}\n        onShowToast={showToast}\n      />\n\n      {/* AI ASSISTANT FLOATING BUTTON & MODAL */}\n      <AiAssistantModal\n        lang={lang}\n      />\n\n      {/* TOAST MESSAGE */}\n      {toastMsg && (\n        <div className=\"toast-bar\">\n          <span>✨ {toastMsg}</span>\n        </div>\n      )}\n    </div>\n  );\n}\n\nfunction ThemeIcon({ theme }: { theme: Theme }) {\n  if (theme === "ember") {\n    return (\n      <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n        <path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z\" />\n      </svg>\n    );\n  }\n  if (theme === "caspian") {\n    return (\n      <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n        <path d=\"M12 3a9 9 0 0 0-9 9 9 9 0 0 0 9 9 9 9 0 0 0 9-9 9 9 0 0 0-9-9zm0 16a7 7 0 0 1-7-7 7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7z\" />\n      </svg>\n    );\n  }\n  return (\n    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n      <path d=\"M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z\" />\n    </svg>\n  );\n}\n\nfunction SunIcon() {\n  return (\n    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\">\n      <circle cx=\"12\" cy=\"12\" r=\"5\" />\n      <line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"3\" />\n      <line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"23\" />\n      <line x1=\"4.22\" y1=\"4.22\" x2=\"5.64\" y2=\"5.64\" />\n      <line x1=\"18.36\" y1=\"18.36\" x2=\"19.78\" y2=\"19.78\" />\n      <line x1=\"1\" y1=\"12\" x2=\"3\" y2=\"12\" />\n      <line x1=\"21\" y1=\"12\" x2=\"23\" y2=\"12\" />\n      <line x1=\"4.22\" y1=\"19.78\" x2=\"5.64\" y2=\"18.36\" />\n      <line x1=\"18.36\" y1=\"5.64\" x2=\"19.78\" y2=\"4.22\" />\n    </svg>\n  );\n}\n\nfunction MoonIcon() {\n  return (\n    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\">\n      <path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\" />\n    </svg>\n  );\n}\n
+                      bgDark: "linear-gradient(135deg, rgba(109, 40, 217, 0.65) 0%, rgba(55, 18, 115, 0.88) 100%)",
+                      bgLight: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+                      badgeColor: isDark ? "#f3e8ff" : "#6d28d9",
+                      badgeBorder: isDark ? "#c084fc" : "#8b5cf6",
+                      badgeBg: isDark ? "rgba(168, 85, 247, 0.35)" : "#ffffff",
+                      textColor: isDark ? "#ffffff" : "#2e1065",
+                      textShadow: isDark ? "0 2px 6px rgba(0, 0, 0, 0.75)" : "none",
+                    },
+                    // Card 1: Vibrant Sunset Amber / Fire Gold
+                    {
+                      border: isDark ? "#fbbf24" : "#d97706",
+                      glow: isDark ? "rgba(245, 158, 11, 0.45)" : "rgba(217, 119, 6, 0.25)",
+                      bgDark: "linear-gradient(135deg, rgba(180, 83, 9, 0.7) 0%, rgba(95, 35, 5, 0.9) 100%)",
+                      bgLight: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+                      badgeColor: isDark ? "#fef08a" : "#92400e",
+                      badgeBorder: isDark ? "#fbbf24" : "#d97706",
+                      badgeBg: isDark ? "rgba(245, 158, 11, 0.35)" : "#ffffff",
+                      textColor: isDark ? "#ffffff" : "#451a03",
+                      textShadow: isDark ? "0 2px 6px rgba(0, 0, 0, 0.75)" : "none",
+                    },
+                    // Card 2: Cyber Emerald / Mint Jade
+                    {
+                      border: isDark ? "#34d399" : "#16a34a",
+                      glow: isDark ? "rgba(16, 185, 129, 0.5)" : "rgba(22, 163, 74, 0.25)",
+                      bgDark: "linear-gradient(135deg, rgba(5, 150, 105, 0.7) 0%, rgba(4, 47, 36, 0.92) 100%)",
+                      bgLight: "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",
+                      badgeColor: isDark ? "#a7f3d0" : "#14532d",
+                      badgeBorder: isDark ? "#34d399" : "#16a34a",
+                      badgeBg: isDark ? "rgba(16, 185, 129, 0.35)" : "#ffffff",
+                      textColor: isDark ? "#ffffff" : "#022c22",
+                      textShadow: isDark ? "0 2px 6px rgba(0, 0, 0, 0.75)" : "none",
+                    },
+                  ];
+
+                  const conf = themeConfigs[ci] || themeConfigs[0];
+
+                  return (
+                    <div
+                      className={`hero-prop-card hero-prop-${ci}`}
+                      key={ci}
+                      style={{
+                        background: isDark ? conf.bgDark : conf.bgLight,
+                        border: `2px solid ${conf.border}`,
+                        boxShadow: `0 10px 28px ${conf.glow}`,
+                      }}
+                    >
+                      <div className="hero-prop-card-head">
+                        <span
+                          className="hero-prop-badge"
+                          style={{
+                            borderColor: conf.badgeBorder,
+                            color: conf.badgeColor,
+                            background: conf.badgeBg,
+                          }}
+                        >
+                          <span style={{ fontSize: 13 }}>{card.icon}</span> {card.badge}
+                        </span>
+                      </div>
+
+                      <p
+                        className="hero-prop-text"
+                        style={{
+                          color: conf.textColor,
+                          textShadow: conf.textShadow,
+                          textAlign: "center",
+                        }}
+                      >
+                        «{card.text}»
+                      </p>
+
+                      {"btnText" in card && (card as any).btnText && (
+                        <button
+                          className="hero-prop-btn"
+                          style={{
+                            background: isDark
+                              ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                              : "linear-gradient(135deg, #16a34a, #15803d)",
+                            color: "#ffffff",
+                            border: isDark ? "1px solid #86efac" : "none",
+                            boxShadow: isDark
+                              ? "0 4px 18px rgba(34, 197, 94, 0.55)"
+                              : "0 4px 14px rgba(22, 163, 74, 0.35)",
+                          }}
+                          onClick={() => {
+                            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                        >
+                          {(card as any).btnText}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 🌟 STATS BAR — LUXURIOUS ENHANCED CARDS */}
+        <section className="section stats-sec">
+          <div className="section-head text-center">
+            <h2>{t.statsTitle}</h2>
+          </div>
+          <div className="stats-cards-grid">
+            {t.stats.map((st, i) => {
+              const p = STAT_PRESETS[i] || STAT_PRESETS[0];
+              const isDark = mode === "dark";
+              const badgeText = lang === "tr" ? p.badgeTr : lang === "en" ? p.badgeEn : lang === "ar" ? p.badgeAr : p.badgeUg;
+              return (
+                <div
+                  className="stat-card-luxury"
+                  key={i}
+                  style={{
+                    background: isDark ? p.bgDark : p.bgLight,
+                    border: `2px solid ${p.border}`,
+                    boxShadow: `0 12px 32px ${isDark ? p.glow : "rgba(0,0,0,0.06)"}`,
+                  }}
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-badge-chip" style={{ borderColor: p.border, color: isDark ? "#fff" : "#111" }}>
+                      <span className="stat-icon">{p.icon}</span> {badgeText}
+                    </span>
+                  </div>
+                  <div
+                    className="stat-number-display"
+                    style={{
+                      color: isDark ? p.numDark : p.numLight,
+                      textShadow: isDark ? `0 0 20px ${p.glow}` : "none",
+                    }}
+                  >
+                    {st.val}
+                  </div>
+                  <h3 className="stat-title-text" style={{ color: isDark ? "#f8fafc" : "#0f172a" }}>
+                    {st.label}
+                  </h3>
+                  <p className="stat-sub-text" style={{ color: isDark ? "#94a3b8" : "#475569" }}>
+                    {st.sub}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ABOUT */}
+        {(page === "home" || page === "about") && (
+          <section id="about" className="section about-sec">
+            <img className="about-bg" src={aboutBg} alt="" />
+            <div className="about-inner">
+              <h2>{t.aboutTitle}</h2>
+              <p>{t.about}</p>
+              <p className="about-wish">{t.aboutWish}</p>
+            </div>
+          </section>
+        )}
+
+        {/* SERVICES */}
+        {(page === "home" || page === "services") && (
+          <section id="services" className="section">
+            <h2>{t.servicesTitle}</h2>
+            <div className="grid g3">
+              {t.services.map((s, i) => (
+                <article className={`card svc svc-${i}`} key={s.t}>
+                  <h3>{s.t}</h3>
+                  <p>{s.d}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 🌟 PROMO STATIC CAROUSEL (2 CARDS ON PC, 1 CARD ON MOBILE, WITH ARROW BUTTONS & FULL IMAGES) */}
+        {page === "home" && (
+          <section className="promo-carousel-sec">
+            <div className="promo-carousel-container">
+              {/* Prev Navigation Button */}
+              <button
+                className="promo-nav-btn promo-prev-btn"
+                onClick={dir === "rtl" ? handleNextPromo : handlePrevPromo}
+                aria-label="Previous Slide"
+                title={lang === "ug" ? "ئالدىنقى" : lang === "ar" ? "السابق" : lang === "tr" ? "Önceki" : "Previous"}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={dir === "rtl" ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6"} />
+                </svg>
+              </button>
+
+              {/* Viewport */}
+              <div className="promo-carousel-viewport">
+                <div
+                  className="promo-carousel-track"
+                  style={{ "--promo-idx": promoIndex } as React.CSSProperties}
+                >
+                  {promoAds.map((ad, idx) => {
+                    const adImage = ad.image || defaultPromoAds[idx]?.image;
+                    const adText = t.ads[idx] || ad.text;
+                    return (
+                      <div className="promo-slide-item" key={ad.id || idx}>
+                        <article className="promo-banner-card">
+                          <img className="promo-banner-img" src={adImage} alt={adText} />
+                          <div className="promo-banner-overlay">
+                            <span className="promo-banner-text">{adText}</span>
+                          </div>
+                        </article>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Next Navigation Button */}
+              <button
+                className="promo-nav-btn promo-next-btn"
+                onClick={dir === "rtl" ? handlePrevPromo : handleNextPromo}
+                aria-label="Next Slide"
+                title={lang === "ug" ? "كېيىنكى" : lang === "ar" ? "التالي" : lang === "tr" ? "Sonraki" : "Next"}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={dir === "rtl" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} />
+                </svg>
+              </button>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="promo-dots">
+              {promoAds.map((_, i) => (
+                <button
+                  key={i}
+                  className={"promo-dot" + (promoIndex === i ? " active" : "")}
+                  onClick={() => setPromoIndex(i)}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* WORK / CASE STUDIES (100% MULTILINGUAL IN ARABIC, UYGHUR, TURKISH, ENGLISH) */}
+        {(page === "home" || page === "work") && (
+          <section id="work" className="section">
+            <div className="section-head-row">
+              <div>
+                <h2>{t.workTitle}</h2>
+                <p className="work-hint-badge">{t.workHint}</p>
+              </div>
+            </div>
+            <div className="grid g2">
+              {showcaseProjects.map((p, i) => {
+                const img = p.image || defaultShowcaseProjects[i]?.image || "media/pos-v4.jpg";
+                const nameColor = p.nameColor || WORK_NAME_COLORS[i % WORK_NAME_COLORS.length];
+                const descColor = p.descColor || WORK_DESC_COLORS[i % WORK_DESC_COLORS.length];
+                const displayName = p.name || t.works[i]?.t || "تۈر";
+                const displayDesc = p.desc || t.works[i]?.d || p.title || "";
+                return (
+                  <article
+                    className="card work-card interactive-work-card"
+                    key={p.id || i}
+                    onClick={() => setActiveProject(i)}
+                  >
+                    <div className="work-photo-wrap">
+                      <img
+                        className="work-photo"
+                        src={img}
+                        alt=""
+                        style={i === 1 ? { objectPosition: "top center" } : undefined}
+                      />
+                      <div className="work-inspect-overlay">
+                        <span className="inspect-chip">
+                          🔍 {lang === "ar" ? "عرض التفاصيل" : lang === "tr" ? "Detayları İncele" : lang === "en" ? "Inspect Details" : "تەپسىلات كۆرۈش"}
+                        </span>
+                      </div>
+                    </div>
+                    <p style={{ margin: "8px 0 0", lineHeight: 1.9, fontSize: 17 }}>
+                      <b
+                        className="work-name"
+                        style={{ color: nameColor, background: "#ecfdf5" }}
+                      >
+                        {displayName}
+                      </b>
+                      {" — "}
+                      <span style={{ color: descColor }}>{displayDesc}</span>
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+
+
+        {/* PROCESS */}
+        {(page === "home" || page === "process") && (
+          <section id="process" className="section">
+            <h2>{t.processTitle}</h2>
+            <div className="steps">
+              {t.steps.map((s, i) => (
+                <div className={`step step-${i}`} key={s} style={{ backgroundImage: `url(${stepImgs[i]})` }}>
+                  <b>0{i + 1}</b>
+                  <span>{s}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+
+
+
+
+        {/* DIRECT QUICK CONTACT BUTTONS BAR */}
+        <section className="section direct-contact-sec">
+          <div className="card direct-card">
+            <div className="section-head">
+              <h2>{t.directContactTitle}</h2>
+              <p className="subhead">{t.directContactSubtitle}</p>
+            </div>
+            <div className="direct-buttons-row">
+              <a
+                href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="direct-btn wa-btn"
+              >
+                <img src="media/icon-whatsapp.png" alt="WhatsApp" className="contact-icon-img" />
+                <span>{t.whatsappBtn}</span>
+              </a>
+              <a
+                href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
+                target="_blank"
+                rel="noreferrer"
+                className="direct-btn tg-btn"
+              >
+                <img src="media/icon-telegram.png" alt="Telegram" className="contact-icon-img" />
+                <span>{t.telegramBtn}</span>
+              </a>
+              <a
+                href={`tel:${rawWhatsapp || "8613000000000"}`}
+                className="direct-btn phone-btn"
+              >
+                <img src="media/icon-phone.png" alt="Phone" className="contact-icon-img" />
+                <span>{t.phoneCallBtn || "تېلېفون قىلىش"}</span>
+              </a>
+              <button
+                type="button"
+                className="direct-btn mail-btn"
+                onClick={copyEmail}
+              >
+                <span className="btn-icon">📋</span>
+                <span>{t.copyEmailBtn}</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* CONTACT FORM */}
+        {(page === "home" || page === "contact") && (
+          <section id="contact" className="section">
+            <h2>{t.contactTitle}</h2>
+            <form
+              className="form card"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Automatically register into Leads CRM state and localStorage
+                const newLead: LeadItem = {
+                  id: "L" + Date.now().toString().slice(-3),
+                  name: contactName || "خېرىدار",
+                  contact: contactEmail,
+                  service: "تور بېكەت ۋە تېخنىكا",
+                  estDays: "5-8 كۈن",
+                  date: new Date().toISOString().slice(0, 10),
+                  status: "new",
+                  note: contactMessage || "يېڭى ئالاقە جەدۋىلى ئۇچۇرى",
+                };
+                updateLeads([newLead, ...leads]);
+
+                alert(
+                  lang === "tr"
+                    ? "Mesajınız başarıyla iletildi ve CRM sistemine kaydedildi!"
+                    : lang === "en"
+                    ? "Message sent successfully and logged into CRM!"
+                    : lang === "ar"
+                    ? "تم إرسال رسالتكم بنجاح وتسجيلها في النظام!"
+                    : "ئۇچۇرىڭىز تاپشۇرۇۋېلىندى ۋە سىستېمىغا رەسمىي كىرگۈزۈلدى!"
+                );
+                setContactName("");
+                setContactEmail("");
+                setContactMessage("");
+              }}
+            >
+              <input
+                required
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder={t.name}
+              />
+              <input
+                type="email"
+                required
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                placeholder="email@domain.com"
+                dir="ltr"
+              />
+              <textarea
+                required
+                rows={5}
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                placeholder={t.msg}
+              />
+              <button className="btn" type="submit">
+                {t.send}
+              </button>
+            </form>
+          </section>
+        )}
+      </main>
+
+      {/* FOOTER */}
+      <footer>
+        <div className="wrap footer-wrap">
+          <div>{settings.brandName ? `© 2026 ${settings.brandName}` : t.footer}</div>
+          <div className="footer-links">
+            <a href="#home">{t.nav.home}</a>
+            <a href="#services">{t.nav.services}</a>
+            <a href="#work">{t.nav.work}</a>
+            <a href="#contact">{t.nav.contact}</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* ADMIN AUTH / LOGIN MODAL */}
+      <AdminAuthModal
+        lang={lang}
+        isOpen={authModalOpen}
+        onClose={handleAuthClose}
+        onSuccess={handleAuthSuccess}
+        onShowToast={showToast}
+        credentials={credentials}
+        onUpdateCredentials={updateCredentials}
+      />
+
+      {/* PROJECT DETAIL MODAL / LIGHTBOX (100% DYNAMIC AND MULTILINGUAL) */}
+      {activeProject !== null && (
+        <div className="modal-backdrop" onClick={() => setActiveProject(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
+              ✕
+            </button>
+            <div className="modal-image-wrap">
+              <img
+                src={showcaseProjects[activeProject]?.image || defaultShowcaseProjects[activeProject]?.image}
+                alt=""
+                className="modal-image"
+                style={activeProject === 1 ? { objectPosition: "top center" } : undefined}
+              />
+              <span className="modal-cat-badge">
+                {t.projectDetails[activeProject]?.category}
+              </span>
+            </div>
+            <div className="modal-content">
+              <h2 className="modal-title">{t.projectDetails[activeProject]?.title}</h2>
+              <p className="modal-tagline">{t.projectDetails[activeProject]?.tagline}</p>
+
+              {/* Tags */}
+              <div className="modal-tags">
+                {t.projectDetails[activeProject]?.tags.map((tag, idx) => (
+                  <span className="modal-tag" key={idx}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+
+              {/* Features */}
+              <div className="modal-section-title">
+                {lang === "ar"
+                  ? "أبرز الميزات والحلول المنفذة:"
+                  : lang === "tr"
+                  ? "Sağlanan Temel Özellikler:"
+                  : lang === "en"
+                  ? "Key Capabilities Delivered:"
+                  : "ئاساسلىق ئىقتىدار ۋە ھەل قىلىش چارىلىرى:"}
+              </div>
+              <ul className="modal-features-list">
+                {t.projectDetails[activeProject]?.features.map((feat, fidx) => (
+                  <li key={fidx}>
+                    <span className="feat-check">✓</span>
+                    <span>{feat}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Deliverables */}
+              <div className="modal-deliverables">
+                <strong>
+                  {lang === "ar"
+                    ? "المخرجات: "
+                    : lang === "tr"
+                    ? "Teslim Edilenler: "
+                    : lang === "en"
+                    ? "Deliverables: "
+                    : "تاپشۇرۇلىدىغان مەھسۇلات: "}
+                </strong>
+                <span>{t.projectDetails[activeProject]?.deliverables}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="modal-actions">
+                <button
+                  className="btn"
+                  onClick={() => selectProjectForInquiry(activeProject)}
+                >
+                  {lang === "ar"
+                    ? "طلب مشروع مماثل"
+                    : lang === "tr"
+                    ? "Benzer Proje İçin Teklif Al"
+                    : lang === "en"
+                    ? "Inquire Similar Project"
+                    : "مۇشۇنداق تۈر سۈرۈشتۈرۈش"}
+                </button>
+                <button
+                  className="btn ghost"
+                  onClick={() => setActiveProject(null)}
+                >
+                  {lang === "ar" ? "إغلاق" : lang === "tr" ? "Kapat" : lang === "en" ? "Close" : "تاقاش"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WECHAT MODAL */}
+      {wechatModal && (
+        <div className="modal-backdrop" onClick={() => setWechatModal(false)}>
+          <div className="modal-card small-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setWechatModal(false)}>
+              ✕
+            </button>
+            <div className="small-modal-content">
+              <h3>WeChat ID</h3>
+              <div className="wechat-box">
+                <code>{settings.wechat || "ShafaqTechHub"}</code>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    navigator.clipboard.writeText(settings.wechat || "ShafaqTechHub");
+                    showToast(t.copiedToast);
+                    setWechatModal(false);
+                  }}
+                >
+                  {lang === "tr" ? "ID Kopyala" : lang === "en" ? "Copy ID" : lang === "ar" ? "نسخ المعرّف" : "ID كۆچۈرۈش"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST NOTIFICATION */}
+      {toastMsg && (
+        <div className="toast-bar">
+          <span>✨ {toastMsg}</span>
+        </div>
+      )}
+
+      {/* 🤖 FLOATING AI ASSISTANT & KNOWLEDGE BASE CHAT */}
+      <AiAssistantModal
+        lang={lang}
+        whatsappNumber={settings.whatsapp}
+        onOpenEstimator={() => {
+          setPage("home");
+          setTimeout(() => {
+            document.querySelector(".estimator-sec")?.scrollIntoView({ behavior: "smooth" });
+          }, 80);
+        }}
+        onOpenContact={() => {
+          setPage("home");
+          setTimeout(() => {
+            document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+          }, 80);
+        }}
+        onOpenWork={() => {
+          setPage("home");
+          setTimeout(() => {
+            document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
+          }, 80);
+        }}
+      />
+
+      {/* FLOATING QUICK CONTACT BAR */}
+      <aside className="floating-contact">
+        <a
+          href={`tel:${rawWhatsapp || "8613000000000"}`}
+          className="float-btn float-phone"
+          title={t.phoneCallBtn || "Telephone"}
+        >
+          <img src="media/icon-phone.png" alt="Phone" className="float-icon-img" />
+        </a>
+        <a
+          href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
+          target="_blank"
+          rel="noreferrer"
+          className="float-btn float-wa"
+          title="WhatsApp"
+        >
+          <img src="media/icon-whatsapp.png" alt="WhatsApp" className="float-icon-img" />
+        </a>
+        <a
+          href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
+          target="_blank"
+          rel="noreferrer"
+          className="float-btn float-tg"
+          title="Telegram"
+        >
+          <img src="media/icon-telegram.png" alt="Telegram" className="float-icon-img" />
+        </a>
+      </aside>
+    </div>
+  );
+}
+
+function ThemeIcon({ theme: _theme }: { theme?: Theme } = {}) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 4a8 8 0 0 0 0 16V4z" fill="currentColor" />
+    </svg>
+  );
+}
+function SunIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+    </svg>
+  );
+}
+function MoonIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M16.5 13.5A7 7 0 0 1 10 4a7 7 0 1 0 6.5 9.5z" />
+    </svg>
+  );
+}
