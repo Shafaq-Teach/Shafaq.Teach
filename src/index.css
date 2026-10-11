@@ -1,4 +1,9 @@
 @font-face {
+  font-family: "ALKATIP Basma";
+  src: local("ALKATIP Basma"), url("./assets/fonts/ALKATIPBasma.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
   font-family: "UKIJ Ekran";
   src: url("./assets/fonts/UKIJEkran.woff2") format("woff2");
   font-display: swap;
@@ -11,8 +16,8 @@
 
 :root {
   --radius: 22px;
-  --font-ug: "UKIJ Ekran", "IBM Plex Sans Arabic", sans-serif;
-  --font-ar: "IBM Plex Sans Arabic", "UKIJ Ekran", sans-serif;
+  --font-ug: "ALKATIP Basma", "ALKATIP Asliya", "UKIJ Ekran", "Microsoft Uighur", "IBM Plex Sans Arabic", sans-serif;
+  --font-ar: "IBM Plex Sans Arabic", "ALKATIP Basma", "UKIJ Ekran", sans-serif;
   --font-en: "Outfit", system-ui, sans-serif;
 
   /* 🌌 CYBER COSMIC MIDNIGHT THEME (EXACT MATCH WITH BLOCKCHAIN DESIGN) */
