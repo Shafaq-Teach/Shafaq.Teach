@@ -187,11 +187,49 @@ type Mode = "dark" | "light";
 const themes: Theme[] = ["ember", "caspian", "orchid"];
 const langLabel: Record<Lang, string> = { ug: "ئۇيغۇرچە", tr: "Türkçe", en: "English", ar: "العربية" };
 
+const VALID_LANGS: readonly Lang[] = ["ug", "tr", "en", "ar"];
+const VALID_THEMES: readonly Theme[] = ["ember", "caspian", "orchid"];
+const VALID_MODES: readonly Mode[] = ["dark", "light"];
+const VALID_NAV_PAGES = ["home", "about", "services", "work", "process", "contact"] as const;
+
+function readSafeStorage<T extends string>(
+  key: string,
+  allowedValues: readonly T[],
+  fallback: T,
+): T {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw && (allowedValues as readonly string[]).includes(raw)
+      ? (raw as T)
+      : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeSafeStorage(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage quota or strict privacy mode exceptions
+  }
+}
+
+function resolveHashPage(): string {
+  try {
+    const h = window.location.hash.replace(/^#/, "").toLowerCase();
+    if (!h || h.includes("sensiz520")) return "home";
+    return (VALID_NAV_PAGES as readonly string[]).includes(h) ? h : "home";
+  } catch {
+    return "home";
+  }
+}
+
 export default function App() {
-  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "ug");
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("theme") as Theme) || "ember");
-  const [mode, setMode] = useState<Mode>(() => (localStorage.getItem("mode") as Mode) || "dark");
-  const [page, setPage] = useState("home");
+  const [lang, setLang] = useState<Lang>(() => readSafeStorage("lang", VALID_LANGS, "ug"));
+  const [theme, setTheme] = useState<Theme>(() => readSafeStorage("theme", VALID_THEMES, "ember"));
+  const [mode, setMode] = useState<Mode>(() => readSafeStorage("mode", VALID_MODES, "dark"));
+  const [page, setPage] = useState<string>(() => resolveHashPage());
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement>(null);
@@ -586,10 +624,30 @@ export default function App() {
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.mode = mode;
     document.body.dataset.lang = lang;
-    localStorage.setItem("lang", lang);
-    localStorage.setItem("theme", theme);
-    localStorage.setItem("mode", mode);
+    writeSafeStorage("lang", lang);
+    writeSafeStorage("theme", theme);
+    writeSafeStorage("mode", mode);
   }, [lang, theme, mode, dir]);
+
+  // Synchronize browser URL hash navigation with page state
+  useEffect(() => {
+    const handleHashNav = () => {
+      const h = window.location.hash.replace(/^#/, "").toLowerCase();
+      if (h.includes("sensiz520")) return;
+      if ((VALID_NAV_PAGES as readonly string[]).includes(h)) {
+        setPage(h);
+      } else if (!h) {
+        setPage("home");
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashNav);
+    window.addEventListener("popstate", handleHashNav);
+    return () => {
+      window.removeEventListener("hashchange", handleHashNav);
+      window.removeEventListener("popstate", handleHashNav);
+    };
+  }, []);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -789,10 +847,14 @@ export default function App() {
     <div className="app">
       {/* Top Ticker */}
       <header className="nav">
-        <div className="ticker">
+        <div className="ticker" role="region" aria-label="Promotions">
           <div className="ticker-track">
             {rollingAds.map((ad, i) => (
-              <span key={i} className="ticker-item">
+              <span
+                key={i}
+                className="ticker-item"
+                aria-hidden={i >= (promoAds?.length || 1) ? "true" : undefined}
+              >
                 {ad}
               </span>
             ))}
@@ -1366,20 +1428,37 @@ export default function App() {
               className="form card"
               onSubmit={(e) => {
                 e.preventDefault();
+                const trimmedName = contactName.trim();
+                const trimmedEmail = contactEmail.trim();
+                const trimmedMsg = contactMessage.trim();
+
+                if (!trimmedName || !trimmedEmail || !trimmedMsg) {
+                  showToast(
+                    lang === "tr"
+                      ? "⚠️ Lütfen tüm alanları eksiksiz doldurun!"
+                      : lang === "en"
+                      ? "⚠️ Please fill in all fields properly!"
+                      : lang === "ar"
+                      ? "⚠️ يرجى ملء جميع الحقول بشكل صحيح!"
+                      : "⚠️ بارلىق كاتەكچىلەرنى تولۇق ۋە توغرا كىرگۈزۈڭ!"
+                  );
+                  return;
+                }
+
                 // Automatically register into Leads CRM state and localStorage
                 const newLead: LeadItem = {
                   id: "L" + Date.now().toString().slice(-3),
-                  name: contactName || "خېرىدار",
-                  contact: contactEmail,
+                  name: trimmedName,
+                  contact: trimmedEmail,
                   service: "تور بېكەت ۋە تېخنىكا",
                   estDays: "5-8 كۈن",
                   date: new Date().toISOString().slice(0, 10),
                   status: "new",
-                  note: contactMessage || "يېڭى ئالاقە جەدۋىلى ئۇچۇرى",
+                  note: trimmedMsg,
                 };
                 updateLeads([newLead, ...leads]);
 
-                alert(
+                showToast(
                   lang === "tr"
                     ? "Mesajınız başarıyla iletildi ve CRM sistemine kaydedildi!"
                     : lang === "en"
@@ -1395,6 +1474,7 @@ export default function App() {
             >
               <input
                 required
+                aria-label={t.name}
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
                 placeholder={t.name}
@@ -1402,6 +1482,7 @@ export default function App() {
               <input
                 type="email"
                 required
+                aria-label="Email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 placeholder="email@domain.com"
@@ -1409,12 +1490,13 @@ export default function App() {
               />
               <textarea
                 required
+                aria-label={t.msg}
                 rows={5}
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
                 placeholder={t.msg}
               />
-              <button className="btn" type="submit">
+              <button className="btn" type="submit" aria-label={t.send}>
                 {t.send}
               </button>
             </form>

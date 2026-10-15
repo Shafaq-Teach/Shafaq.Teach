@@ -2161,3 +2161,20 @@ select:focus-visible {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ♿ ACCESSIBILITY: REDUCED MOTION PREFERENCE */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track,
+  .promo-track,
+  .dash-suspense-spinner {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
