@@ -18,11 +18,16 @@ import {
   getCloudShowcaseProjects,
   syncCloudShowcaseProjects,
   getCloudLeads,
+  addCloudLead,
   syncCloudLeads,
   getCloudSettings,
   syncCloudSettings,
   getCloudAdminCredentials,
   syncCloudAdminCredentials,
+  DEFAULT_ADMIN_HASH,
+  isSha256Hex,
+  sanitizeImageUrl,
+  sanitizeText,
   supabase,
 } from "./supabase";
 
@@ -107,10 +112,8 @@ const STAT_PRESETS = [
   },
 ];
 
-
-
 const defaultStudioSettings: StudioSettings = {
-  brandName: "", // Empty by default so it naturally follows t.brand
+  brandName: "",
   whatsapp: "+86 130 0000 0000",
   telegram: "@shafaq_tech",
   email: "contact@shafaqtech.com",
@@ -192,6 +195,9 @@ const VALID_THEMES: readonly Theme[] = ["ember", "caspian", "orchid"];
 const VALID_MODES: readonly Mode[] = ["dark", "light"];
 const VALID_NAV_PAGES = ["home", "about", "services", "work", "process", "contact"] as const;
 
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const CONTACT_COOLDOWN_MS = 30 * 1000; // 30s anti-spam cooldown
+
 function readSafeStorage<T extends string>(
   key: string,
   allowedValues: readonly T[],
@@ -215,6 +221,51 @@ function writeSafeStorage(key: string, value: string): void {
   }
 }
 
+function removeSafeStorage(key: string): void {
+  try {
+    window.localStorage.removeItem(key);
+    window.sessionStorage.removeItem(key);
+  } catch {
+    // Ignore
+  }
+}
+
+function readValidAdminSession(): boolean {
+  try {
+    const rawSession = localStorage.getItem("shafaq_admin_session");
+    if (!rawSession) return false;
+    const parsed = JSON.parse(rawSession);
+    if (!parsed || typeof parsed.token !== "string" || !parsed.token || typeof parsed.expiresAt !== "number") {
+      return false;
+    }
+    if (Date.now() > parsed.expiresAt) {
+      removeSafeStorage("shafaq_admin_session");
+      removeSafeStorage("shafaq_admin_auth");
+      removeSafeStorage("shafaq_admin_token");
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function writeAdminSession(token: string): void {
+  const sessionPayload = JSON.stringify({
+    token,
+    expiresAt: Date.now() + SESSION_TTL_MS,
+  });
+  writeSafeStorage("shafaq_admin_session", sessionPayload);
+  writeSafeStorage("shafaq_admin_token", token);
+  writeSafeStorage("shafaq_admin_auth", "true");
+}
+
+function clearAdminSession(): void {
+  removeSafeStorage("shafaq_admin_session");
+  removeSafeStorage("shafaq_admin_auth");
+  removeSafeStorage("shafaq_admin_token");
+}
+
 function resolveHashPage(): string {
   try {
     const h = window.location.hash.replace(/^#/, "").toLowerCase();
@@ -234,33 +285,36 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement>(null);
 
-  // Authentication State
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem("shafaq_admin_auth") === "true" || sessionStorage.getItem("shafaq_admin_auth") === "true";
-    } catch {
-      return false;
-    }
-  });
+  // Authentication State (Validated with token + expiration timestamp)
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => readValidAdminSession());
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const [credentials, setCredentials] = useState<AdminCredentials>(() => {
     try {
       const saved = localStorage.getItem("shafaq_admin_credentials");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.username === "string" && isSha256Hex(String(parsed.passwordHash || ""))) {
+          return {
+            username: parsed.username,
+            passwordHash: String(parsed.passwordHash).toLowerCase(),
+            token: typeof parsed.token === "string" ? parsed.token : "",
+          };
+        }
+      }
     } catch {
       // fallback
     }
-    return { username: "admin", passwordHash: "admin123", token: "" };
+    return { username: "admin", passwordHash: DEFAULT_ADMIN_HASH, token: "" };
   });
 
   const updateCredentials = async (creds: AdminCredentials) => {
     const newToken = await syncCloudAdminCredentials(creds.username, creds.passwordHash);
     const updated: AdminCredentials = { ...creds, token: newToken || creds.token || "" };
     setCredentials(updated);
-    localStorage.setItem("shafaq_admin_credentials", JSON.stringify(updated));
+    writeSafeStorage("shafaq_admin_credentials", JSON.stringify(updated));
     if (newToken) {
-      localStorage.setItem("shafaq_admin_token", newToken);
+      writeAdminSession(newToken);
     }
   };
 
@@ -273,6 +327,7 @@ export default function App() {
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactMessage, setContactMessage] = useState("");
+  const lastContactSubmitRef = useRef<number>(0);
 
   const langBox = useRef<HTMLDivElement>(null);
   const t = copy[lang];
@@ -291,7 +346,7 @@ export default function App() {
 
   const updateSettings = (newSettings: StudioSettings) => {
     setSettings(newSettings);
-    localStorage.setItem("shafaq_studio_settings", JSON.stringify(newSettings));
+    writeSafeStorage("shafaq_studio_settings", JSON.stringify(newSettings));
     syncCloudSettings(newSettings);
   };
 
@@ -299,7 +354,10 @@ export default function App() {
   const [promoAds, setPromoAds] = useState<PromoAdItem[]>(() => {
     try {
       const saved = localStorage.getItem("shafaq_promo_ads");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {
       // fallback
     }
@@ -316,10 +374,8 @@ export default function App() {
     const total = promoAds.length;
 
     if (isMob) {
-      // 📱 Mobile: Slide 1 card at a time
       setPromoIndex((prev) => (prev <= 0 ? total - 1 : prev - 1));
     } else {
-      // 💻 Desktop/PC: Slide 2 cards at a time
       const maxIdx = Math.max(0, total - 2);
       setPromoIndex((prev) => {
         if (prev <= 0) return maxIdx;
@@ -334,10 +390,8 @@ export default function App() {
     const total = promoAds.length;
 
     if (isMob) {
-      // 📱 Mobile: Slide 1 card at a time
       setPromoIndex((prev) => (prev >= total - 1 ? 0 : prev + 1));
     } else {
-      // 💻 Desktop/PC: Slide 2 cards at a time
       const maxIdx = Math.max(0, total - 2);
       setPromoIndex((prev) => {
         if (prev >= maxIdx) return 0;
@@ -348,7 +402,7 @@ export default function App() {
 
   const updatePromoAds = (newAds: PromoAdItem[]) => {
     setPromoAds(newAds);
-    localStorage.setItem("shafaq_promo_ads", JSON.stringify(newAds));
+    writeSafeStorage("shafaq_promo_ads", JSON.stringify(newAds));
     syncCloudPromoAds(newAds);
   };
 
@@ -356,7 +410,10 @@ export default function App() {
   const [showcaseProjects, setShowcaseProjects] = useState<ShowcaseProject[]>(() => {
     try {
       const saved = localStorage.getItem("shafaq_showcase_projects");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {
       // fallback
     }
@@ -365,7 +422,7 @@ export default function App() {
 
   const updateShowcaseProjects = (newProjects: ShowcaseProject[]) => {
     setShowcaseProjects(newProjects);
-    localStorage.setItem("shafaq_showcase_projects", JSON.stringify(newProjects));
+    writeSafeStorage("shafaq_showcase_projects", JSON.stringify(newProjects));
     syncCloudShowcaseProjects(newProjects);
   };
 
@@ -373,7 +430,10 @@ export default function App() {
   const [leads, setLeads] = useState<LeadItem[]>(() => {
     try {
       const saved = localStorage.getItem("shafaq_leads");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {
       // fallback
     }
@@ -413,62 +473,54 @@ export default function App() {
 
   const updateLeads = (newLeads: LeadItem[]) => {
     setLeads(newLeads);
-    localStorage.setItem("shafaq_leads", JSON.stringify(newLeads));
+    writeSafeStorage("shafaq_leads", JSON.stringify(newLeads));
     syncCloudLeads(newLeads);
   };
 
   // 🌐 INITIAL CLOUD DATA FETCH & REALTIME LISTENERS FROM SUPABASE
   useEffect(() => {
-    // 0. Fetch Cloud Admin Credentials & Invalidate Stale Session
     getCloudAdminCredentials().then((cloudCreds) => {
       if (cloudCreds) {
         setCredentials(cloudCreds);
-        localStorage.setItem("shafaq_admin_credentials", JSON.stringify(cloudCreds));
+        writeSafeStorage("shafaq_admin_credentials", JSON.stringify(cloudCreds));
         const localToken = localStorage.getItem("shafaq_admin_token");
-        const isAuth = localStorage.getItem("shafaq_admin_auth") === "true";
+        const isAuth = readValidAdminSession();
         if (isAuth && cloudCreds.token && localToken !== cloudCreds.token) {
           setIsAdminAuthenticated(false);
-          localStorage.removeItem("shafaq_admin_auth");
-          localStorage.removeItem("shafaq_admin_token");
-          sessionStorage.removeItem("shafaq_admin_auth");
+          clearAdminSession();
           setPage((prev) => (prev === "dashboard" ? "home" : prev));
         }
       }
     });
 
-    // 1. Fetch Cloud Promo Ads
     getCloudPromoAds().then((cloudAds) => {
       if (cloudAds && cloudAds.length > 0) {
         setPromoAds(cloudAds);
-        localStorage.setItem("shafaq_promo_ads", JSON.stringify(cloudAds));
+        writeSafeStorage("shafaq_promo_ads", JSON.stringify(cloudAds));
       }
     });
 
-    // 2. Fetch Cloud Showcase Projects
     getCloudShowcaseProjects().then((cloudProjects) => {
       if (cloudProjects && cloudProjects.length > 0) {
         setShowcaseProjects(cloudProjects);
-        localStorage.setItem("shafaq_showcase_projects", JSON.stringify(cloudProjects));
+        writeSafeStorage("shafaq_showcase_projects", JSON.stringify(cloudProjects));
       }
     });
 
-    // 3. Fetch Cloud Leads
     getCloudLeads().then((cloudLeads) => {
       if (cloudLeads && cloudLeads.length > 0) {
         setLeads(cloudLeads);
-        localStorage.setItem("shafaq_leads", JSON.stringify(cloudLeads));
+        writeSafeStorage("shafaq_leads", JSON.stringify(cloudLeads));
       }
     });
 
-    // 4. Fetch Cloud Settings
     getCloudSettings().then((cloudSettings) => {
       if (cloudSettings) {
         setSettings(cloudSettings);
-        localStorage.setItem("shafaq_studio_settings", JSON.stringify(cloudSettings));
+        writeSafeStorage("shafaq_studio_settings", JSON.stringify(cloudSettings));
       }
     });
 
-    // 5. Setup Realtime sync
     try {
       const channel = supabase
         .channel("supabase-realtime-sync")
@@ -476,13 +528,11 @@ export default function App() {
           getCloudAdminCredentials().then((cloudCreds) => {
             if (cloudCreds) {
               setCredentials(cloudCreds);
-              localStorage.setItem("shafaq_admin_credentials", JSON.stringify(cloudCreds));
+              writeSafeStorage("shafaq_admin_credentials", JSON.stringify(cloudCreds));
               const localToken = localStorage.getItem("shafaq_admin_token");
-              if (localToken !== cloudCreds.token) {
+              if (cloudCreds.token && localToken !== cloudCreds.token) {
                 setIsAdminAuthenticated(false);
-                localStorage.removeItem("shafaq_admin_auth");
-                localStorage.removeItem("shafaq_admin_token");
-                sessionStorage.removeItem("shafaq_admin_auth");
+                clearAdminSession();
                 setPage((prev) => (prev === "dashboard" ? "home" : prev));
                 showToast("⚠️ مەخپىي نومۇر ئۆزگەرتىلدى. قايتا كىرىڭ.");
               }
@@ -565,7 +615,7 @@ export default function App() {
 
   const updateProjects = (newProjects: ProjectItem[]) => {
     setProjects(newProjects);
-    localStorage.setItem("shafaq_projects", JSON.stringify(newProjects));
+    writeSafeStorage("shafaq_projects", JSON.stringify(newProjects));
   };
 
   // 6. POS Nodes (Persisted and synced)
@@ -615,7 +665,7 @@ export default function App() {
 
   const updatePosNodes = (newNodes: PosNode[]) => {
     setPosNodes(newNodes);
-    localStorage.setItem("shafaq_pos_nodes", JSON.stringify(newNodes));
+    writeSafeStorage("shafaq_pos_nodes", JSON.stringify(newNodes));
   };
 
   useEffect(() => {
@@ -629,7 +679,6 @@ export default function App() {
     writeSafeStorage("mode", mode);
   }, [lang, theme, mode, dir]);
 
-  // Synchronize browser URL hash navigation with page state
   useEffect(() => {
     const handleHashNav = () => {
       const h = window.location.hash.replace(/^#/, "").toLowerCase();
@@ -663,7 +712,6 @@ export default function App() {
     return () => document.removeEventListener("pointerdown", close);
   }, []);
 
-  // Toast timer
   useEffect(() => {
     if (!toastMsg) return;
     const timer = setTimeout(() => setToastMsg(null), 3000);
@@ -687,9 +735,10 @@ export default function App() {
       const search = window.location.search.toLowerCase();
 
       if (path.includes("sensiz520") || hash.includes("sensiz520") || search.includes("sensiz520")) {
-        if (isAdminAuthenticated) {
+        if (isAdminAuthenticated && readValidAdminSession()) {
           setPage("dashboard");
         } else {
+          setIsAdminAuthenticated(false);
           setPage("home");
           setAuthModalOpen(true);
         }
@@ -705,12 +754,10 @@ export default function App() {
     };
   }, [isAdminAuthenticated]);
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = (sessionToken: string) => {
+    writeAdminSession(sessionToken);
     setIsAdminAuthenticated(true);
     setAuthModalOpen(false);
-    if (credentials.token) {
-      localStorage.setItem("shafaq_admin_token", credentials.token);
-    }
     setPage("dashboard");
   };
 
@@ -729,9 +776,7 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAdminAuthenticated(false);
-    localStorage.removeItem("shafaq_admin_auth");
-    localStorage.removeItem("shafaq_admin_token");
-    sessionStorage.removeItem("shafaq_admin_auth");
+    clearAdminSession();
     setPage("home");
     try {
       const cleanUrl = window.location.origin + window.location.pathname.replace(/\/sensiz520\/?/gi, "/");
@@ -752,7 +797,6 @@ export default function App() {
     }
   };
 
-  // Public Navigation Links (Dashboard is completely hidden from public eyes)
   const nav = useMemo(
     () =>
       [
@@ -766,19 +810,56 @@ export default function App() {
     [t],
   );
 
-  // Dynamic Brand name: follows current language (t.brand) or user custom settings if specifically set
   const displayBrand = settings.brandName && settings.brandName.trim() ? settings.brandName : t.brand;
 
-  // Dynamic Rolling Ticker ads: naturally multilingual with current language
+  // Resolve Promo Ad text: use CMS custom text if modified by admin, otherwise multilingual translation
+  const resolvedPromoTexts = useMemo(() => {
+    const sourceAds = promoAds && promoAds.length > 0 ? promoAds : defaultPromoAds;
+    return sourceAds.map((ad, idx) => {
+      const isDefaultUgText = defaultPromoAds[idx] && ad.text === defaultPromoAds[idx].text;
+      if (isDefaultUgText && t.ads[idx]) {
+        return t.ads[idx];
+      }
+      return ad.text || t.ads[idx] || "";
+    });
+  }, [promoAds, t.ads]);
+
   const rollingAds = useMemo(() => {
-    return [...t.ads, ...t.ads];
-  }, [t.ads]);
+    return [...resolvedPromoTexts, ...resolvedPromoTexts];
+  }, [resolvedPromoTexts]);
 
   const rawWhatsapp = (settings.whatsapp || "8613000000000").replace(/[^0-9]/g, "");
   const rawTelegram = (settings.telegram || "shafaq_tech").replace("@", "");
 
+  // Helper to resolve localized or custom CMS details for a ShowcaseProject
+  const getResolvedProjectDetail = (index: number) => {
+    const p = showcaseProjects[index];
+    const defIdx = defaultShowcaseProjects.findIndex((d) => d.id === p?.id);
+    const isUnmodifiedDefault =
+      defIdx !== -1 &&
+      p &&
+      p.name === defaultShowcaseProjects[defIdx].name &&
+      p.title === defaultShowcaseProjects[defIdx].title &&
+      p.desc === defaultShowcaseProjects[defIdx].desc;
+
+    const i18nDetail = defIdx !== -1 ? t.projectDetails[defIdx] : undefined;
+    const i18nWork = defIdx !== -1 ? t.works[defIdx] : undefined;
+
+    return {
+      cardName: isUnmodifiedDefault && i18nWork ? i18nWork.t : p?.name || i18nWork?.t || "تۈر",
+      cardDesc: isUnmodifiedDefault && i18nWork ? i18nWork.d : p?.desc || i18nWork?.d || p?.title || "",
+      title: isUnmodifiedDefault && i18nDetail ? i18nDetail.title : p?.title || i18nDetail?.title || "",
+      tagline: isUnmodifiedDefault && i18nDetail ? i18nDetail.tagline : p?.desc || i18nDetail?.tagline || "",
+      category: isUnmodifiedDefault && i18nDetail ? i18nDetail.category : p?.category || i18nDetail?.category || "",
+      tags: p?.tags && p.tags.length > 0 ? p.tags : i18nDetail?.tags || ["React", "TypeScript"],
+      features: i18nDetail?.features || t.projectDetails[0].features,
+      deliverables: i18nDetail?.deliverables || t.projectDetails[0].deliverables,
+      image: sanitizeImageUrl(p?.image || defaultShowcaseProjects[defIdx !== -1 ? defIdx : 0]?.image, "media/pos-v4.jpg"),
+    };
+  };
+
   const selectProjectForInquiry = (index: number) => {
-    const p = t.projectDetails[index];
+    const p = getResolvedProjectDetail(index);
     const quoteText =
       lang === "tr"
         ? `[Proje Bilgisi: ${p.title}]\nKategori: ${p.category}\nTeknolojiler: ${p.tags.join(", ")}\n\nBenzer bir proje için fiyat ve teslim süresi öğrenmek istiyorum:`
@@ -796,7 +877,6 @@ export default function App() {
     }, 80);
   };
 
-  // If dashboard is active and authenticated, render full Dashboard view (SINGLE HEADER INSIDE DASHBOARD)
   if (page === "dashboard" && isAdminAuthenticated) {
     return (
       <div className="app">
@@ -843,6 +923,8 @@ export default function App() {
     );
   }
 
+  const activeModalProject = activeProject !== null ? getResolvedProjectDetail(activeProject) : null;
+
   return (
     <div className="app">
       {/* Top Ticker */}
@@ -853,7 +935,7 @@ export default function App() {
               <span
                 key={i}
                 className="ticker-item"
-                aria-hidden={i >= (promoAds?.length || 1) ? "true" : undefined}
+                aria-hidden={i >= resolvedPromoTexts.length ? "true" : undefined}
               >
                 {ad}
               </span>
@@ -939,7 +1021,6 @@ export default function App() {
               {mode === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
 
-            {/* Mobile Menu Hamburger Button */}
             <button
               className={"mobile-menu-btn" + (mobileMenuOpen ? " open" : "")}
               onClick={() => setMobileMenuOpen((v) => !v)}
@@ -998,7 +1079,6 @@ export default function App() {
               })}
             </nav>
 
-            {/* Quick action shortcuts in mobile drawer */}
             <div className="mobile-dropdown-footer">
               <a
                 href={`https://wa.me/${rawWhatsapp}`}
@@ -1054,14 +1134,11 @@ export default function App() {
                 </div>
               </div>
 
-              {/* 🌟 3 HIGH-CONVERTING VALUE PROPOSITION CARDS (STACKED VERTICALLY IN HERO REGION) */}
               <div className="hero-prop-col">
                 {t.ctaBanner.cards.map((card, ci) => {
                   const isDark = mode === "dark";
 
-                  // 3 DISTINCT, ATTRACTIVE, EYE-CATCHING COLOR THEMES
                   const themeConfigs = [
-                    // Card 0: Royal Electric Violet / Purple
                     {
                       border: isDark ? "#c084fc" : "#8b5cf6",
                       glow: isDark ? "rgba(168, 85, 247, 0.45)" : "rgba(139, 92, 246, 0.25)",
@@ -1073,7 +1150,6 @@ export default function App() {
                       textColor: isDark ? "#ffffff" : "#2e1065",
                       textShadow: isDark ? "0 2px 6px rgba(0, 0, 0, 0.75)" : "none",
                     },
-                    // Card 1: Vibrant Sunset Amber / Fire Gold
                     {
                       border: isDark ? "#fbbf24" : "#d97706",
                       glow: isDark ? "rgba(245, 158, 11, 0.45)" : "rgba(217, 119, 6, 0.25)",
@@ -1085,7 +1161,6 @@ export default function App() {
                       textColor: isDark ? "#ffffff" : "#451a03",
                       textShadow: isDark ? "0 2px 6px rgba(0, 0, 0, 0.75)" : "none",
                     },
-                    // Card 2: Cyber Emerald / Mint Jade
                     {
                       border: isDark ? "#34d399" : "#16a34a",
                       glow: isDark ? "rgba(16, 185, 129, 0.5)" : "rgba(22, 163, 74, 0.25)",
@@ -1135,7 +1210,7 @@ export default function App() {
                         «{card.text}»
                       </p>
 
-                      {"btnText" in card && (card as any).btnText && (
+                      {"btnText" in card && (card as { btnText?: string }).btnText && (
                         <button
                           className="hero-prop-btn"
                           style={{
@@ -1152,7 +1227,7 @@ export default function App() {
                             document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
                           }}
                         >
-                          {(card as any).btnText}
+                          {(card as { btnText?: string }).btnText}
                         </button>
                       )}
                     </div>
@@ -1163,7 +1238,7 @@ export default function App() {
           </section>
         )}
 
-        {/* 🌟 STATS BAR — LUXURIOUS ENHANCED CARDS */}
+        {/* STATS BAR */}
         <section className="section stats-sec">
           <div className="section-head text-center">
             <h2>{t.statsTitle}</h2>
@@ -1236,11 +1311,10 @@ export default function App() {
           </section>
         )}
 
-        {/* 🌟 PROMO STATIC CAROUSEL (2 CARDS ON PC, 1 CARD ON MOBILE, WITH ARROW BUTTONS & FULL IMAGES) */}
+        {/* PROMO STATIC CAROUSEL */}
         {page === "home" && (
           <section className="promo-carousel-sec">
             <div className="promo-carousel-container">
-              {/* Prev Navigation Button */}
               <button
                 className="promo-nav-btn promo-prev-btn"
                 onClick={dir === "rtl" ? handleNextPromo : handlePrevPromo}
@@ -1252,15 +1326,14 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* Viewport */}
               <div className="promo-carousel-viewport">
                 <div
                   className="promo-carousel-track"
                   style={{ "--promo-idx": promoIndex } as React.CSSProperties}
                 >
                   {promoAds.map((ad, idx) => {
-                    const adImage = ad.image || defaultPromoAds[idx]?.image;
-                    const adText = t.ads[idx] || ad.text;
+                    const adImage = sanitizeImageUrl(ad.image || defaultPromoAds[idx]?.image, "media/pos-v4.jpg");
+                    const adText = resolvedPromoTexts[idx] || ad.text;
                     return (
                       <div className="promo-slide-item" key={ad.id || idx}>
                         <article className="promo-banner-card">
@@ -1275,7 +1348,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Next Navigation Button */}
               <button
                 className="promo-nav-btn promo-next-btn"
                 onClick={dir === "rtl" ? handlePrevPromo : handleNextPromo}
@@ -1288,7 +1360,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Pagination Dots */}
             <div className="promo-dots">
               {promoAds.map((_, i) => (
                 <button
@@ -1302,7 +1373,7 @@ export default function App() {
           </section>
         )}
 
-        {/* WORK / CASE STUDIES (100% MULTILINGUAL IN ARABIC, UYGHUR, TURKISH, ENGLISH) */}
+        {/* WORK / CASE STUDIES */}
         {(page === "home" || page === "work") && (
           <section id="work" className="section">
             <div className="section-head-row">
@@ -1313,11 +1384,9 @@ export default function App() {
             </div>
             <div className="grid g2">
               {showcaseProjects.map((p, i) => {
-                const img = p.image || defaultShowcaseProjects[i]?.image || "media/pos-v4.jpg";
+                const resolved = getResolvedProjectDetail(i);
                 const nameColor = p.nameColor || WORK_NAME_COLORS[i % WORK_NAME_COLORS.length];
                 const descColor = p.descColor || WORK_DESC_COLORS[i % WORK_DESC_COLORS.length];
-                const displayName = p.name || t.works[i]?.t || "تۈر";
-                const displayDesc = p.desc || t.works[i]?.d || p.title || "";
                 return (
                   <article
                     className="card work-card interactive-work-card"
@@ -1327,8 +1396,8 @@ export default function App() {
                     <div className="work-photo-wrap">
                       <img
                         className="work-photo"
-                        src={img}
-                        alt=""
+                        src={resolved.image}
+                        alt={resolved.cardName}
                         style={i === 1 ? { objectPosition: "top center" } : undefined}
                       />
                       <div className="work-inspect-overlay">
@@ -1342,10 +1411,10 @@ export default function App() {
                         className="work-name"
                         style={{ color: nameColor, background: "#ecfdf5" }}
                       >
-                        {displayName}
+                        {resolved.cardName}
                       </b>
                       {" — "}
-                      <span style={{ color: descColor }}>{displayDesc}</span>
+                      <span style={{ color: descColor }}>{resolved.cardDesc}</span>
                     </p>
                   </article>
                 );
@@ -1353,8 +1422,6 @@ export default function App() {
             </div>
           </section>
         )}
-
-
 
         {/* PROCESS */}
         {(page === "home" || page === "process") && (
@@ -1371,10 +1438,6 @@ export default function App() {
           </section>
         )}
 
-
-
-
-
         {/* DIRECT QUICK CONTACT BUTTONS BAR */}
         <section className="section direct-contact-sec">
           <div className="card direct-card">
@@ -1386,7 +1449,7 @@ export default function App() {
               <a
                 href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="direct-btn wa-btn"
               >
                 <img src="media/icon-whatsapp.png" alt="WhatsApp" className="contact-icon-img" />
@@ -1395,7 +1458,7 @@ export default function App() {
               <a
                 href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="direct-btn tg-btn"
               >
                 <img src="media/icon-telegram.png" alt="Telegram" className="contact-icon-img" />
@@ -1428,9 +1491,23 @@ export default function App() {
               className="form card"
               onSubmit={(e) => {
                 e.preventDefault();
-                const trimmedName = contactName.trim();
-                const trimmedEmail = contactEmail.trim();
-                const trimmedMsg = contactMessage.trim();
+                const now = Date.now();
+                if (now - lastContactSubmitRef.current < CONTACT_COOLDOWN_MS) {
+                  showToast(
+                    lang === "tr"
+                      ? "⏳ Lütfen yeni mesaj göndermeden önce birkaç saniye bekleyin."
+                      : lang === "en"
+                      ? "⏳ Please wait a few seconds before sending another inquiry."
+                      : lang === "ar"
+                      ? "⏳ يرجى الانتظار قليلاً قبل إرسال رسالة أخرى."
+                      : "⏳ قايتا ئۇچۇر ئەۋەتىشتىن بۇرۇن ئازراق ساقلاڭ.",
+                  );
+                  return;
+                }
+
+                const trimmedName = sanitizeText(contactName, 120);
+                const trimmedEmail = sanitizeText(contactEmail, 150);
+                const trimmedMsg = sanitizeText(contactMessage, 1500);
 
                 if (!trimmedName || !trimmedEmail || !trimmedMsg) {
                   showToast(
@@ -1440,14 +1517,15 @@ export default function App() {
                       ? "⚠️ Please fill in all fields properly!"
                       : lang === "ar"
                       ? "⚠️ يرجى ملء جميع الحقول بشكل صحيح!"
-                      : "⚠️ بارلىق كاتەكچىلەرنى تولۇق ۋە توغرا كىرگۈزۈڭ!"
+                      : "⚠️ بارلىق كاتەكچىلەرنى تولۇق ۋە توغرا كىرگۈزۈڭ!",
                   );
                   return;
                 }
 
-                // Automatically register into Leads CRM state and localStorage
+                lastContactSubmitRef.current = now;
+
                 const newLead: LeadItem = {
-                  id: "L" + Date.now().toString().slice(-3),
+                  id: "L" + Date.now().toString().slice(-5),
                   name: trimmedName,
                   contact: trimmedEmail,
                   service: "تور بېكەت ۋە تېخنىكا",
@@ -1456,7 +1534,11 @@ export default function App() {
                   status: "new",
                   note: trimmedMsg,
                 };
-                updateLeads([newLead, ...leads]);
+                const nextLeads = [newLead, ...leads];
+                setLeads(nextLeads);
+                writeSafeStorage("shafaq_leads", JSON.stringify(nextLeads));
+                // Insert only the new lead to Supabase rather than overwriting cloud leads with visitor's localStorage
+                addCloudLead(newLead);
 
                 showToast(
                   lang === "tr"
@@ -1465,7 +1547,7 @@ export default function App() {
                     ? "Message sent successfully and logged into CRM!"
                     : lang === "ar"
                     ? "تم إرسال رسالتكم بنجاح وتسجيلها في النظام!"
-                    : "ئۇچۇرىڭىز تاپشۇرۇۋېلىندى ۋە سىستېمىغا رەسمىي كىرگۈزۈلدى!"
+                    : "ئۇچۇرىڭىز تاپشۇرۇۋېلىندى ۋە سىستېمىغا رەسمىي كىرگۈزۈلدى!",
                 );
                 setContactName("");
                 setContactEmail("");
@@ -1474,6 +1556,7 @@ export default function App() {
             >
               <input
                 required
+                maxLength={120}
                 aria-label={t.name}
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
@@ -1482,6 +1565,7 @@ export default function App() {
               <input
                 type="email"
                 required
+                maxLength={150}
                 aria-label="Email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
@@ -1490,6 +1574,7 @@ export default function App() {
               />
               <textarea
                 required
+                maxLength={1500}
                 aria-label={t.msg}
                 rows={5}
                 value={contactMessage}
@@ -1528,8 +1613,8 @@ export default function App() {
         onUpdateCredentials={updateCredentials}
       />
 
-      {/* PROJECT DETAIL MODAL / LIGHTBOX (100% DYNAMIC AND MULTILINGUAL) */}
-      {activeProject !== null && (
+      {/* PROJECT DETAIL MODAL / LIGHTBOX */}
+      {activeProject !== null && activeModalProject && (
         <div className="modal-backdrop" onClick={() => setActiveProject(null)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setActiveProject(null)}>
@@ -1537,29 +1622,27 @@ export default function App() {
             </button>
             <div className="modal-image-wrap">
               <img
-                src={showcaseProjects[activeProject]?.image || defaultShowcaseProjects[activeProject]?.image}
-                alt=""
+                src={activeModalProject.image}
+                alt={activeModalProject.title}
                 className="modal-image"
                 style={activeProject === 1 ? { objectPosition: "top center" } : undefined}
               />
               <span className="modal-cat-badge">
-                {t.projectDetails[activeProject]?.category}
+                {activeModalProject.category}
               </span>
             </div>
             <div className="modal-content">
-              <h2 className="modal-title">{t.projectDetails[activeProject]?.title}</h2>
-              <p className="modal-tagline">{t.projectDetails[activeProject]?.tagline}</p>
+              <h2 className="modal-title">{activeModalProject.title}</h2>
+              <p className="modal-tagline">{activeModalProject.tagline}</p>
 
-              {/* Tags */}
               <div className="modal-tags">
-                {t.projectDetails[activeProject]?.tags.map((tag, idx) => (
+                {activeModalProject.tags.map((tag, idx) => (
                   <span className="modal-tag" key={idx}>
                     #{tag}
                   </span>
                 ))}
               </div>
 
-              {/* Features */}
               <div className="modal-section-title">
                 {lang === "ar"
                   ? "أبرز الميزات والحلول المنفذة:"
@@ -1570,7 +1653,7 @@ export default function App() {
                   : "ئاساسلىق ئىقتىدار ۋە ھەل قىلىش چارىلىرى:"}
               </div>
               <ul className="modal-features-list">
-                {t.projectDetails[activeProject]?.features.map((feat, fidx) => (
+                {activeModalProject.features.map((feat, fidx) => (
                   <li key={fidx}>
                     <span className="feat-check">✓</span>
                     <span>{feat}</span>
@@ -1578,7 +1661,6 @@ export default function App() {
                 ))}
               </ul>
 
-              {/* Deliverables */}
               <div className="modal-deliverables">
                 <strong>
                   {lang === "ar"
@@ -1589,10 +1671,9 @@ export default function App() {
                     ? "Deliverables: "
                     : "تاپشۇرۇلىدىغان مەھسۇلات: "}
                 </strong>
-                <span>{t.projectDetails[activeProject]?.deliverables}</span>
+                <span>{activeModalProject.deliverables}</span>
               </div>
 
-              {/* Actions */}
               <div className="modal-actions">
                 <button
                   className="btn"
@@ -1652,14 +1733,16 @@ export default function App() {
         </div>
       )}
 
-      {/* 🤖 FLOATING AI ASSISTANT & KNOWLEDGE BASE CHAT */}
+      {/* FLOATING AI ASSISTANT & KNOWLEDGE BASE CHAT */}
       <AiAssistantModal
         lang={lang}
         whatsappNumber={settings.whatsapp}
         onOpenEstimator={() => {
           setPage("home");
           setTimeout(() => {
-            document.querySelector(".estimator-sec")?.scrollIntoView({ behavior: "smooth" });
+            (document.querySelector(".estimator-sec") || document.getElementById("contact"))?.scrollIntoView({
+              behavior: "smooth",
+            });
           }, 80);
         }}
         onOpenContact={() => {
@@ -1688,7 +1771,7 @@ export default function App() {
         <a
           href={`https://wa.me/${rawWhatsapp || "8613000000000"}?text=Hello%20${encodeURIComponent(displayBrand)}`}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="float-btn float-wa"
           title="WhatsApp"
         >
@@ -1697,7 +1780,7 @@ export default function App() {
         <a
           href={`https://t.me/${rawTelegram || "shafaq_tech"}`}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="float-btn float-tg"
           title="Telegram"
         >

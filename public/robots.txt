@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /sensiz520
 
 Sitemap: https://shafaq-teach.yulgun353.workers.dev/sitemap.xml

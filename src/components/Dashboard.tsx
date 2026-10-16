@@ -105,6 +105,80 @@ interface DashboardProps {
 
 const langLabel: Record<Lang, string> = { ug: "ئۇيغۇرچە", tr: "Türkçe", en: "English", ar: "العربية" };
 
+const ALLOWED_IMAGE_MIMES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8 MB max raw upload
+
+function processSafeImageUpload(
+  file: File | undefined,
+  lang: Lang,
+  onShowToast: (msg: string) => void,
+  onSuccess: (dataUrl: string) => void,
+) {
+  if (!file) return;
+  if (!ALLOWED_IMAGE_MIMES.includes(file.type)) {
+    onShowToast(
+      lang === "tr"
+        ? "⚠️ Yalnızca güvenli görsel formatları (JPG, PNG, WEBP, GIF) yüklenebilir!"
+        : lang === "en"
+        ? "⚠️ Only safe raster image formats (JPG, PNG, WEBP, GIF) are allowed!"
+        : lang === "ar"
+        ? "⚠️ يُسمح فقط بصيغ الصور الآمنة (JPG, PNG, WEBP, GIF)!"
+        : "⚠️ پەقەت بىخەتەر رەسىم فورماتلىرىلا (JPG, PNG, WEBP, GIF) يوللىنىدۇ!",
+    );
+    return;
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    onShowToast(
+      lang === "tr"
+        ? "⚠️ Görsel boyutu çok büyük (Maksimum 8MB)!"
+        : lang === "en"
+        ? "⚠️ Image file is too large (Maximum 8MB)!"
+        : lang === "ar"
+        ? "⚠️ حجم الصورة كبير جداً (الحد الأقصى 8MB)!"
+        : "⚠️ رەسىم ھەجمى بەك چوڭ (ئەڭ چوڭ بولغاندا 8MB)!",
+    );
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const rawDataUrl = event.target?.result as string;
+    if (!rawDataUrl || !rawDataUrl.startsWith("data:image/")) return;
+
+    // Compress and bound dimensions via canvas so localStorage & cloud sync never hit quota limits
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const maxDim = 1200;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.84);
+          onSuccess(compressed);
+          return;
+        }
+      } catch {
+        // Fallback to rawDataUrl if canvas fails
+      }
+      onSuccess(rawDataUrl);
+    };
+    img.onerror = () => {
+      onShowToast("⚠️ Image load error");
+    };
+    img.src = rawDataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
 export default function Dashboard({
   lang,
   onSetLang,
@@ -258,19 +332,14 @@ export default function Dashboard({
     );
   };
 
-  // Image Upload handler for Ads
+  // Image Upload handler for Ads (Validated & Compressed)
   const handleAdImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
+    processSafeImageUpload(e.target.files?.[0], lang, onShowToast, (dataUrl) => {
       setEditablePromoAds((prev) =>
         prev.map((ad, i) => (i === index ? { ...ad, image: dataUrl } : ad))
       );
       onShowToast(lang === "tr" ? "Görsel yüklendi!" : "رەسىم مۇۋەپپەقىيەتلىك يۈكلەندى!");
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const savePromoAds = () => {
@@ -286,19 +355,14 @@ export default function Dashboard({
     );
   };
 
-  // Image Upload handler for Showcase Projects
+  // Image Upload handler for Showcase Projects (Validated & Compressed)
   const handleProjectImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
+    processSafeImageUpload(e.target.files?.[0], lang, onShowToast, (dataUrl) => {
       setEditableProjects((prev) =>
         prev.map((p, i) => (i === index ? { ...p, image: dataUrl } : p))
       );
       onShowToast(lang === "tr" ? "Proje görseli yüklendi!" : "ئەسەر رەسىمى مۇۋەپپەقىيەتلىك يۈكلەندى!");
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const saveShowcaseProjects = () => {
@@ -315,16 +379,12 @@ export default function Dashboard({
     );
   };
 
-  // Add New Project Handlers
+  // Add New Project Handlers (Validated & Compressed)
   const handleNewProjectImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setNewProjImage(event.target?.result as string);
+    processSafeImageUpload(e.target.files?.[0], lang, onShowToast, (dataUrl) => {
+      setNewProjImage(dataUrl);
       onShowToast(lang === "tr" ? "Görsel seçildi!" : "رەسىم تاللاندى!");
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const handleCreateShowcaseProject = (e: React.FormEvent) => {
@@ -363,16 +423,12 @@ export default function Dashboard({
     onShowToast(lang === "tr" ? "Proje silindi!" : "ئەسەر تىزىملىكتىن ئۆچۈرۈلدى! 🗑️");
   };
 
-  // Add New Promo Ad Handlers
+  // Add New Promo Ad Handlers (Validated & Compressed)
   const handleNewAdImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setNewAdImg(event.target?.result as string);
+    processSafeImageUpload(e.target.files?.[0], lang, onShowToast, (dataUrl) => {
+      setNewAdImg(dataUrl);
       onShowToast(lang === "tr" ? "Reklam görseli seçildi!" : "ئېلان رەسىمى تاللاندى!");
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const handleCreatePromoAd = (e: React.FormEvent) => {
@@ -999,7 +1055,7 @@ export default function Dashboard({
                             <a
                               href={`https://wa.me/${formWhatsapp.replace(/[^0-9]/g, "") || "8613000000000"}?text=Hello%20${encodeURIComponent(lead.name)}`}
                               target="_blank"
-                              rel="noreferrer"
+                              rel="noopener noreferrer"
                               className="dash-action-btn wa-act"
                               title="WhatsApp"
                             >
@@ -1123,7 +1179,7 @@ export default function Dashboard({
                             )}
                             <input
                               type="file"
-                              accept="image/*"
+                              accept="image/jpeg,image/png,image/webp,image/gif"
                               onChange={handleNewProjectImageUpload}
                               className="dash-file-input"
                             />
@@ -1235,7 +1291,7 @@ export default function Dashboard({
                                 <label className="est-label">{lang === "tr" ? "Yeni Görsel Yükle:" : "يېڭى رەسىم يۈكلەش:"}</label>
                                 <input
                                   type="file"
-                                  accept="image/*"
+                                  accept="image/jpeg,image/png,image/webp,image/gif"
                                   onChange={(e) => handleProjectImageUpload(idx, e)}
                                   className="dash-file-input"
                                 />
@@ -1290,7 +1346,7 @@ export default function Dashboard({
                             )}
                             <input
                               type="file"
-                              accept="image/*"
+                              accept="image/jpeg,image/png,image/webp,image/gif"
                               onChange={handleNewAdImageUpload}
                               className="dash-file-input"
                             />
@@ -1372,7 +1428,7 @@ export default function Dashboard({
                                   <img src={ad.image} alt="" style={{ width: 80, height: 50, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
                                   <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/jpeg,image/png,image/webp,image/gif"
                                     onChange={(e) => handleAdImageUpload(ai, e)}
                                     className="dash-file-input"
                                   />
@@ -1696,6 +1752,7 @@ export default function Dashboard({
                           a.href = url;
                           a.download = `shafaq-tech-backup-${new Date().toISOString().slice(0, 10)}.json`;
                           a.click();
+                          setTimeout(() => URL.revokeObjectURL(url), 1000);
                           onShowToast(lang === "tr" ? "Yedekleme JSON indirildi!" : "سانلىق مەلۇماتلار زاپاسلاندى!");
                         }}
                       >

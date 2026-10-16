@@ -2091,12 +2091,12 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 
 /* TOAST */
 .toast-bar {
-  position: fixed; bottom: 32px; inset-inline-start: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, #15803d, #16a34a); color: #fff;
   padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 14px;
   box-shadow: 0 10px 30px rgba(0,0,0,.4); z-index: 1000; animation: toastIn .25s ease;
 }
-[dir="rtl"] .toast-bar { transform: translateX(50%); }
+[dir="rtl"] .toast-bar { left: 50%; transform: translateX(-50%); }
 
 /* FLOATING CONTACT */
 .floating-contact {

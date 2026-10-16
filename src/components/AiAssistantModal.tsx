@@ -203,7 +203,7 @@ export default function AiAssistantModal({
     if (!action) return;
     if (action === "whatsapp") {
       const cleanNum = (whatsappNumber || "8613000000000").replace(/[^0-9]/g, "");
-      window.open(`https://wa.me/${cleanNum}?text=Hello%20Shafaq%20Tech`, "_blank");
+      window.open(`https://wa.me/${cleanNum}?text=Hello%20Shafaq%20Tech`, "_blank", "noopener,noreferrer");
     } else if (action === "estimator") {
       setIsOpen(false);
       onOpenEstimator();
@@ -369,6 +369,7 @@ export default function AiAssistantModal({
             >
               <input
                 type="text"
+                maxLength={300}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder={lbl.placeholder}
